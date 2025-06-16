@@ -45,10 +45,8 @@ def mix():
   podcast = AudioSegment.from_file(file)
   bgm_path = os.path.join(BGM_FOLDER, bgm_name)
   bgm_audio = AudioSegment.from_file(bgm_path)
-  mixed = podcast.overlay(bgm_audio, loop=True)
+  # mixed = podcast.overlay(bgm_audio, loop=True) # この行は不要です
 
-  output_name = f"{uuid.uuid4().hex}.mp3"
-  output_path = os.path.join(OUTPUT_FOLDER, output_name)
   intro_duration_ms = 5000
   outro_duration_ms = 5000
   podcast_duration_ms = len(podcast)
@@ -96,7 +94,7 @@ def mix():
 
   output_name = f"{uuid.uuid4().hex}.mp3"
   output_path = os.path.join(OUTPUT_FOLDER, output_name)
-  mixed.export(output_path, format='mp3')
+  # mixed.export(output_path, format='mp3') # この行は不要です
   final_mix.export(output_path, format='mp3')
 
   return send_file(output_path, as_attachment=True, download_name='mixed.mp3')
