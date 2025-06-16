@@ -79,6 +79,13 @@ def mix():
   outro_bgm_start_ms = body_bgm_end_ms
   outro_bgm_part = full_bgm[outro_bgm_start_ms:total_mixed_duration_ms]
 
+  # アウトロBGMの最後の1秒をフェードアウト
+  fade_out_duration_ms = 1000
+  if len(outro_bgm_part) >= fade_out_duration_ms:
+    outro_bgm_part = outro_bgm_part.fade_out(fade_out_duration_ms)
+  elif len(outro_bgm_part) > 0: # フェードアウト期間より短い場合は、全期間でフェードアウト
+    outro_bgm_part = outro_bgm_part.fade_out(len(outro_bgm_part))
+
   # 3. ポッドキャスト部分を作成（BGMをダッキングしてポッドキャストをオーバーレイ）
   #    body_bgm_partの音量を下げつつ、podcastを重ねる
   #    podcastとbody_bgm_partの長さは同じはず
