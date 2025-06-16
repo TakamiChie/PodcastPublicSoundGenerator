@@ -49,7 +49,48 @@ def mix():
 
   output_name = f"{uuid.uuid4().hex}.mp3"
   output_path = os.path.join(OUTPUT_FOLDER, output_name)
+  intro_duration_ms = 5000
+  outro_duration_ms = 5000
+  podcast_duration_ms = len(podcast)
+
+  # BGMをポッドキャスト再生中に10%の音量にする（約-20dB）
+  # 20 * log10(0.1) = -20 dB
+  bgm_duck_db = -20.0
+
+  # 最終的なミックスファイルの総再生時間
+  total_mixed_duration_ms = intro_duration_ms + podcast_duration_ms + outro_duration_ms
+
+  # 1. BGM全体を作成（ループとトリミング）
+  #    必要な長さに応じてBGMをループさせ、総再生時間に合わせる
+  full_bgm = bgm_audio
+  if len(full_bgm) < total_mixed_duration_ms:
+    # math.ceilの整数版: (分子 + 分母 - 1) // 分母
+    num_loops = (total_mixed_duration_ms + len(full_bgm) - 1) // len(full_bgm)
+    full_bgm = full_bgm * num_loops
+  full_bgm = full_bgm[:total_mixed_duration_ms]
+
+  # 2. BGMの各パートを抽出
+  intro_bgm_part = full_bgm[:intro_duration_ms]
+
+  body_bgm_start_ms = intro_duration_ms
+  body_bgm_end_ms = intro_duration_ms + podcast_duration_ms
+  body_bgm_part = full_bgm[body_bgm_start_ms:body_bgm_end_ms]
+
+  outro_bgm_start_ms = body_bgm_end_ms
+  outro_bgm_part = full_bgm[outro_bgm_start_ms:total_mixed_duration_ms]
+
+  # 3. ポッドキャスト部分を作成（BGMをダッキングしてポッドキャストをオーバーレイ）
+  #    body_bgm_partの音量を下げつつ、podcastを重ねる
+  #    podcastとbody_bgm_partの長さは同じはず
+  body_with_podcast_ducked_bgm = body_bgm_part.overlay(podcast, gain_during_overlay=bgm_duck_db)
+
+  # 4. 全てのパートを結合
+  final_mix = intro_bgm_part + body_with_podcast_ducked_bgm + outro_bgm_part
+
+  output_name = f"{uuid.uuid4().hex}.mp3"
+  output_path = os.path.join(OUTPUT_FOLDER, output_name)
   mixed.export(output_path, format='mp3')
+  final_mix.export(output_path, format='mp3')
 
   return send_file(output_path, as_attachment=True, download_name='mixed.mp3')
 
