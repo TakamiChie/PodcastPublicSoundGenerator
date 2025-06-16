@@ -13,20 +13,49 @@ os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 
 def get_bgm_options():
-  options = []
-  for fname in os.listdir(BGM_FOLDER):
-    if not fname.lower().endswith('.mp3'):
-      continue
-    path = os.path.join(BGM_FOLDER, fname)
-    try:
-      tags = EasyID3(path)
-      title = tags.get('title', [fname])[0]
-      comment = tags.get('comment', [''])[0]
-      label = f"{title} - {comment}" if comment else title
-    except Exception:
-      label = fname
-    options.append({'file': fname, 'label': label})
-  return options
+  grouped_options = {}  # キー: 表示用ディレクトリ名, 値: option辞書のリスト
+  for root, _, files in os.walk(BGM_FOLDER):
+    # BGM_FOLDERからの相対ディレクトリパス
+    relative_dir_path = os.path.relpath(root, BGM_FOLDER)
+
+    # 表示用のグループラベル
+    if relative_dir_path == ".":
+      group_label = "ルート"  # BGM_FOLDER直下のファイル用
+    else:
+      # Windowsのパス区切り文字 '\' を '/' に置換して表示
+      group_label = relative_dir_path.replace(os.sep, " / ")
+
+    for fname_leaf in files:  # fname_leaf はファイル名のみ (例: "song.mp3")
+      if not fname_leaf.lower().endswith('.mp3'):
+        continue
+
+      full_path = os.path.join(root, fname_leaf)
+      # BGM_FOLDERからの相対パス (例: "song.mp3" や "subdir/song.mp3")
+      # この値がフォームで送信され、mix関数でパスの再構築に使用されます。
+      file_value = os.path.relpath(full_path, BGM_FOLDER)
+
+      try:
+        tags = EasyID3(full_path)
+        id3_title = tags.get('title', [None])[0]
+        # ID3タイトルがあればそれをラベルに、なければファイル名（拡張子なし）をラベルにする
+        label = id3_title if id3_title else os.path.splitext(fname_leaf)[0]
+      except Exception:
+        # EasyID3の処理でエラーが発生した場合は、ファイル名（拡張子なし）をラベルとして使用
+        label = os.path.splitext(fname_leaf)[0]
+
+      if group_label not in grouped_options:
+        grouped_options[group_label] = []
+      grouped_options[group_label].append({'file': file_value, 'label': label, 'stem': fname_leaf})
+
+  # テンプレートで使いやすいように整形し、ソートする
+  options_for_template = []
+  # まずグループ名（ディレクトリ名）でソート
+  for group_label_key in sorted(grouped_options.keys()):
+    options_in_group = grouped_options[group_label_key]
+    # 次に各グループ内の曲名（ラベル）でソート
+    options_in_group.sort(key=lambda x: x['label'])
+    options_for_template.append({'group_label': group_label_key, 'options': options_in_group})
+  return options_for_template
 
 
 @app.route('/')
