@@ -1,6 +1,6 @@
 import os
 import uuid
-from flask import Flask, render_template, request, redirect, url_for, send_file
+from flask import Flask, render_template, request, redirect, url_for, send_file, send_from_directory
 from mutagen.easyid3 import EasyID3
 from pydub import AudioSegment
 from work import set_bgm
@@ -63,6 +63,12 @@ def get_bgm_options():
 def index():
   options = get_bgm_options()
   return render_template('index.html', options=options)
+
+
+@app.route('/bgm/<path:filename>')
+def bgm(filename):
+  """BGMファイルを返す。"""
+  return send_from_directory(BGM_FOLDER, filename)
 
 
 @app.route('/mix', methods=['POST'])
