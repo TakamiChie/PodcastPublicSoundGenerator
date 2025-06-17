@@ -20,8 +20,11 @@
       </optgroup>
       {% endfor %}
     </select><br><br>
+    <button type="button" id="previewBtn">BGM視聴</button><br><br>
+    <audio id="previewAudio"></audio>
     <button type="submit">ミックスしてダウンロード</button>
   </form>
+  <script src="{{ url_for('static', filename='js/preview.js') }}"></script>
 </body>
 
 </html>
