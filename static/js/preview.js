@@ -7,14 +7,15 @@ previewBtn.addEventListener('click', () => {
   if (!selected) {
     return;
   }
-  if (previewAudio.src.endsWith(selected) && !previewAudio.paused) {
+  const encoded = encodeURIComponent(selected);
+  if (previewAudio.src.endsWith(encoded) && !previewAudio.paused) {
     // 再生中にボタンを押したら停止
     previewAudio.pause();
     previewAudio.currentTime = 0;
     previewBtn.textContent = 'BGM視聴';
     return;
   }
-  previewAudio.src = `/bgm/${selected}`;
+  previewAudio.src = `/bgm/${encoded}`;
   previewAudio.play();
   previewBtn.textContent = '停止';
 });
