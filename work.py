@@ -2,6 +2,7 @@ import os
 from pydub import AudioSegment
 
 BGM_FOLDER = os.path.join(os.path.dirname(__file__), 'bgm')
+BGM_DUCK_DB = -20.0 # BGMをポッドキャスト再生中に10%の音量にする（約-20dB） 20 * log10(0.1) = -20 dB
 
 
 def set_bgm(source: AudioSegment, bgm_name: str,
@@ -35,8 +36,7 @@ def set_bgm(source: AudioSegment, bgm_name: str,
     elif len(outro_bgm) > 0:
         outro_bgm = outro_bgm.fade_out(len(outro_bgm))
 
-    bgm_duck_db = -20.0
-    body = body_bgm.overlay(source, gain_during_overlay=bgm_duck_db)
+    body = body_bgm.overlay(source, gain_during_overlay=BGM_DUCK_DB)
 
     final_mix = intro_bgm + body + outro_bgm
     return final_mix
