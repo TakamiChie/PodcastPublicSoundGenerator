@@ -7,17 +7,22 @@ previewBtn.addEventListener('click', () => {
   if (!selected) {
     return;
   }
-  const encoded = encodeURIComponent(selected);
-  if (previewAudio.src.endsWith(encoded) && !previewAudio.paused) {
+  if (!previewAudio.paused) {
     // 再生中にボタンを押したら停止
     previewAudio.pause();
     previewAudio.currentTime = 0;
     previewBtn.textContent = 'BGM視聴';
     return;
   }
-  previewAudio.src = `/bgm/${encoded}`;
+  previewAudio.src = `/bgm/${selected}`;
   previewAudio.play();
   previewBtn.textContent = '停止';
+});
+
+bgmSelect.addEventListener('change', () => {
+  if (!previewAudio.paused) {
+    previewBtn.click();
+  }
 });
 
 previewAudio.addEventListener('ended', () => {
