@@ -2,6 +2,7 @@ import os
 import uuid
 from flask import Flask, render_template, request, redirect, url_for, send_file, send_from_directory
 from mutagen.easyid3 import EasyID3
+from mutagen import File as MutagenFile
 from pydub import AudioSegment
 from work import set_bgm
 
@@ -78,6 +79,15 @@ def mix():
   if not file or not bgm_name:
     return redirect(url_for('index'))
 
+  # 入力音声のID3タグを取得
+  try:
+    file.stream.seek(0)
+    meta = MutagenFile(file.stream, easy=True)
+    orig_tags = dict(meta.tags) if meta and meta.tags else None
+  except Exception:
+    orig_tags = None
+
+  file.stream.seek(0)
   podcast = AudioSegment.from_file(file)
 
   final_mix = set_bgm(podcast, bgm_name)
@@ -85,6 +95,13 @@ def mix():
   output_name = f"{uuid.uuid4().hex}.mp3"
   output_path = os.path.join(OUTPUT_FOLDER, output_name)
   final_mix.export(output_path, format='mp3')
+
+  # 取得したID3タグを出力ファイルに設定
+  if orig_tags:
+    tags = EasyID3()
+    for k, v in orig_tags.items():
+      tags[k] = v
+    tags.save(output_path)
 
   return send_file(output_path, as_attachment=True, download_name='mixed.mp3')
 
