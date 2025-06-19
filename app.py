@@ -3,7 +3,7 @@ import uuid
 from flask import Flask, render_template, request, redirect, url_for, send_file, send_from_directory
 from mutagen.easyid3 import EasyID3
 from pydub import AudioSegment
-from work import set_bgm
+from work import set_bgm, normalize_volume, DEFAULT_TARGET_DB
 
 app = Flask(__name__)
 BGM_FOLDER = os.path.join(os.path.dirname(__file__), 'bgm')
@@ -62,7 +62,7 @@ def get_bgm_options():
 @app.route('/')
 def index():
   options = get_bgm_options()
-  return render_template('index.html', options=options)
+  return render_template('index.html', options=options, target_db=DEFAULT_TARGET_DB)
 
 
 @app.route('/bgm/<path:filename>')
@@ -75,10 +75,16 @@ def bgm(filename):
 def mix():
   file = request.files.get('audio')
   bgm_name = request.form.get('bgm')
+  target_str = request.form.get('target_db', str(DEFAULT_TARGET_DB))
+  try:
+    target_db = float(target_str)
+  except ValueError:
+    target_db = DEFAULT_TARGET_DB
   if not file or not bgm_name:
     return redirect(url_for('index'))
 
   podcast = AudioSegment.from_file(file)
+  podcast = normalize_volume(podcast, target_db)
 
   final_mix = set_bgm(podcast, bgm_name)
 

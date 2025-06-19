@@ -1,6 +1,17 @@
 import os
 from pydub import AudioSegment
 
+DEFAULT_TARGET_DB = 89.0
+
+
+def normalize_volume(audio: AudioSegment, target_db: float = DEFAULT_TARGET_DB) -> AudioSegment:
+  """音源の全体音量をtarget_dbに近づける。"""
+  if audio.dBFS == float('-inf'):
+    return audio
+  target_dbfs = target_db - 100
+  gain = target_dbfs - audio.dBFS
+  return audio.apply_gain(gain)
+
 BGM_FOLDER = os.path.join(os.path.dirname(__file__), 'bgm')
 BGM_DUCK_DB = -20.0 # BGMをポッドキャスト再生中に10%の音量にする（約-20dB） 20 * log10(0.1) = -20 dB
 

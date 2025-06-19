@@ -20,6 +20,8 @@
       </optgroup>
       {% endfor %}
     </select><br><br>
+    <label for="target_db">目標音量(dB):</label>
+    <input type="number" name="target_db" id="target_db" value="{{ target_db }}" step="0.1"><br><br>
     <button type="button" id="previewBtn">BGM視聴</button><br><br>
     <audio id="previewAudio"></audio>
     <button type="submit">ミックスしてダウンロード</button>
