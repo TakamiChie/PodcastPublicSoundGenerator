@@ -5,6 +5,9 @@ const dateInput = document.getElementById('date');
 const genreInput = document.getElementById('genre');
 const previewArea = document.getElementById('previewArea');
 const downloadLink = document.getElementById('downloadLink');
+const previewImg = document.createElement('img');
+previewArea.appendChild(previewImg);
+let currentPngUrl = null;
 
 // MP3からタイトルとジャンルを取得する
 function parseTags(file) {
@@ -125,12 +128,13 @@ async function generateCover() {
     ctx.drawImage(img, 0, 0);
     canvas.toBlob((blob2) => {
       const pngUrl = URL.createObjectURL(blob2);
+      if (currentPngUrl) URL.revokeObjectURL(currentPngUrl);
+      currentPngUrl = pngUrl;
+      previewImg.src = pngUrl;
       downloadLink.href = pngUrl;
       downloadLink.download = 'cover.png';
       downloadLink.textContent = 'ダウンロード';
     });
-    previewArea.innerHTML = '';
-    previewArea.appendChild(img.cloneNode());
     URL.revokeObjectURL(url);
   };
   img.src = url;
