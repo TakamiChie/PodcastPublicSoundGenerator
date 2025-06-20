@@ -1,6 +1,8 @@
 import os
 import uuid
 from flask import Flask, render_template, request, redirect, url_for, send_file, send_from_directory
+import datetime
+import re
 from mutagen.easyid3 import EasyID3
 from mutagen import File as MutagenFile
 from pydub import AudioSegment
@@ -9,6 +11,7 @@ from work import set_bgm
 app = Flask(__name__)
 BGM_FOLDER = os.path.join(os.path.dirname(__file__), 'bgm')
 OUTPUT_FOLDER = os.path.join(os.path.dirname(__file__), 'output')
+COVER_TEMPLATE_FOLDER = os.path.join(os.path.dirname(__file__), 'templates', 'cover_templates')
 
 os.makedirs(BGM_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
@@ -60,10 +63,26 @@ def get_bgm_options():
   return options_for_template
 
 
+def get_cover_templates():
+  templates = []
+  for fname in os.listdir(COVER_TEMPLATE_FOLDER):
+    if fname.lower().endswith('.html'):
+      templates.append(fname)
+  templates.sort()
+  return templates
+
+
 @app.route('/')
 def index():
   options = get_bgm_options()
-  return render_template('index.html', options=options)
+  templates = get_cover_templates()
+  return render_template('index.html', options=options, templates=templates)
+
+
+
+@app.route('/cover_template/<path:tmpl>')
+def cover_template(tmpl):
+  return send_from_directory(COVER_TEMPLATE_FOLDER, tmpl)
 
 
 @app.route('/bgm/<path:filename>')
