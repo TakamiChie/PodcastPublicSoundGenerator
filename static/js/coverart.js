@@ -3,11 +3,8 @@ const templateSelect = document.getElementById('template');
 const titleInput = document.getElementById('title');
 const dateInput = document.getElementById('date');
 const genreInput = document.getElementById('genre');
-const generateBtn = document.getElementById('generateBtn');
 const previewArea = document.getElementById('previewArea');
 const downloadLink = document.getElementById('downloadLink');
-
-let loadedFile = null;
 
 // MP3からタイトルとジャンルを取得する
 function parseTags(file) {
@@ -75,7 +72,6 @@ function parseTags(file) {
 audioInput.addEventListener('change', async () => {
   const file = audioInput.files[0];
   if (!file) return;
-  loadedFile = file;
   const tags = await parseTags(file);
   if (tags.title && !titleInput.value) titleInput.value = tags.title;
   if (tags.genre && !genreInput.value) genreInput.value = tags.genre;
@@ -90,6 +86,7 @@ audioInput.addEventListener('change', async () => {
     }
     dateInput.value = d;
   }
+  generateCover();
 });
 
 function replacePlaceholders(tmpl, data) {
@@ -105,7 +102,7 @@ function toWeekday(dateStr) {
   return '日月火水木金土'.charAt(d.getDay());
 }
 
-generateBtn.addEventListener('click', async () => {
+async function generateCover() {
   if (!templateSelect.value) return;
   const res = await fetch(`/cover_template/${templateSelect.value}`);
   const text = await res.text();
@@ -137,4 +134,9 @@ generateBtn.addEventListener('click', async () => {
     URL.revokeObjectURL(url);
   };
   img.src = url;
-});
+}
+
+templateSelect.addEventListener('change', generateCover);
+titleInput.addEventListener('input', generateCover);
+dateInput.addEventListener('input', generateCover);
+genreInput.addEventListener('input', generateCover);
