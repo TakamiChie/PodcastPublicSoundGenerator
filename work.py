@@ -1,7 +1,7 @@
 import os
 from pydub import AudioSegment
 
-DEFAULT_TARGET_DB = 89.0
+DEFAULT_TARGET_DB = 80.0
 
 
 def normalize_volume(audio: AudioSegment, target_db: float = DEFAULT_TARGET_DB) -> AudioSegment:
