@@ -2,7 +2,7 @@ const audioInput = document.getElementById('audio');
 const templateSelect = document.getElementById('template');
 const titleInput = document.getElementById('title');
 const dateInput = document.getElementById('date');
-const categoryInput = document.getElementById('category');
+const genreInput = document.getElementById('genre');
 const generateBtn = document.getElementById('generateBtn');
 const previewArea = document.getElementById('previewArea');
 const downloadLink = document.getElementById('downloadLink');
@@ -69,7 +69,7 @@ function replacePlaceholders(tmpl, data) {
     .replace(/{{\s*title\s*}}/g, data.title)
     .replace(/{{\s*date\s*}}/g, data.date)
     .replace(/{{\s*weekday\s*}}/g, data.weekday)
-    .replace(/{{\s*category\s*}}/g, data.category);
+    .replace(/{{\s*genre\s*}}/g, data.genre);
 }
 
 function toWeekday(dateStr) {
@@ -85,7 +85,7 @@ generateBtn.addEventListener('click', async () => {
     title: titleInput.value || 'タイトル未設定',
     date: dateInput.value || new Date().toISOString().slice(0, 10),
     weekday: toWeekday(dateInput.value || new Date()),
-    category: categoryInput.value || ''
+    genre: genreInput.value || ''
   };
   const html = replacePlaceholders(text, data);
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800"><foreignObject width="100%" height="100%">${html}</foreignObject></svg>`;
