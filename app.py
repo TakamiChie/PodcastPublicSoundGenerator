@@ -1,6 +1,8 @@
 import os
 import uuid
-from flask import Flask, render_template, request, redirect, url_for, send_file, send_from_directory
+import re
+from datetime import datetime
+from flask import Flask, render_template, request, redirect, url_for, send_file, send_from_directory, jsonify
 from mutagen.easyid3 import EasyID3
 from mutagen import File as MutagenFile
 from pydub import AudioSegment
@@ -60,10 +62,28 @@ def get_bgm_options():
   return options_for_template
 
 
+def get_cover_templates():
+  """カバーアート用テンプレート一覧を取得する"""
+  tmpl_dir = os.path.join(app.template_folder, 'cover_templates')
+  templates = []
+  if os.path.isdir(tmpl_dir):
+    for fname in os.listdir(tmpl_dir):
+      if fname.endswith('.html'):
+        templates.append(fname)
+  templates.sort()
+  return templates
+
+
 @app.route('/')
 def index():
   options = get_bgm_options()
   return render_template('index.html', options=options, target_db=DEFAULT_TARGET_DB)
+
+
+@app.route('/cover_templates')
+def cover_templates():
+  """利用可能なカバーアートテンプレート一覧を返す"""
+  return jsonify(get_cover_templates())
 
 
 @app.route('/bgm/<path:filename>')
@@ -110,6 +130,56 @@ def mix():
     tags.save(output_path)
 
   return send_file(output_path, as_attachment=True, download_name='mixed.mp3')
+
+
+@app.route('/cover_art', methods=['POST'])
+def cover_art():
+  """カバーアートを生成してHTMLとして返す"""
+  file = request.files.get('audio')
+  title = request.form.get('title') or ''
+  genre = request.form.get('genre') or ''
+  tmpl = request.form.get('template') or 'default.html'
+  last_modified = request.form.get('last_modified')
+
+  release_date = None
+  if file:
+    m = re.match(r"(\d{4}-\d{2}-\d{2})", file.filename)
+    if m:
+      release_date = m.group(1)
+    elif last_modified:
+      dt = datetime.fromtimestamp(int(last_modified) / 1000)
+      release_date = dt.strftime('%Y-%m-%d')
+
+  if file and (not title or not genre):
+    try:
+      file.stream.seek(0)
+      meta = MutagenFile(file.stream, easy=True)
+      if meta and meta.tags:
+        if not title:
+          title = meta.tags.get('title', [""])[0]
+        if not genre:
+          genre = meta.tags.get('genre', [""])[0]
+    except Exception:
+      pass
+
+  if not release_date:
+    release_date = datetime.now().strftime('%Y-%m-%d')
+  dt = datetime.strptime(release_date, '%Y-%m-%d')
+  days = ['月', '火', '水', '木', '金', '土', '日']
+  day = days[dt.weekday()]
+
+  html = render_template(f'cover_templates/{tmpl}', title=title, date=release_date, day=day, genre=genre)
+  output_name = f"cover_{uuid.uuid4().hex}.html"
+  output_path = os.path.join(OUTPUT_FOLDER, output_name)
+  with open(output_path, 'w', encoding='utf-8') as f:
+    f.write(html)
+
+  return jsonify({'title': title, 'genre': genre, 'date': release_date, 'day': day, 'url': url_for('output_file', filename=output_name)})
+
+
+@app.route('/output/<path:filename>')
+def output_file(filename):
+  return send_from_directory(OUTPUT_FOLDER, filename, as_attachment=True)
 
 
 if __name__ == '__main__':
