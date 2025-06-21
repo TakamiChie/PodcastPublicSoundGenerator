@@ -4,6 +4,7 @@ const genreInput = document.getElementById('genre');
 const dateInput = document.getElementById('date');
 const templateSelect = document.getElementById('template');
 const coverArea = document.getElementById('coverArea');
+const coverFrame = document.getElementById('coverFrame');
 const coverDownload = document.getElementById('coverDownload');
 
 function loadTemplates() {
@@ -38,7 +39,7 @@ function updateCover() {
       fetch(data.url)
         .then(r => r.text())
         .then(html => {
-          coverArea.innerHTML = html;
+          coverFrame.srcdoc = html;
         });
       coverDownload.dataset.url = data.url;
     });
@@ -52,7 +53,7 @@ dateInput.addEventListener('change', updateCover);
 
 coverDownload.addEventListener('click', e => {
   e.preventDefault();
-  html2canvas(coverArea).then(canvas => {
+  html2canvas(coverFrame.contentDocument.body).then(canvas => {
     const a = document.createElement('a');
     a.href = canvas.toDataURL('image/png');
     a.download = 'cover.png';

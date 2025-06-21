@@ -3,6 +3,10 @@
 
 <head>
   <title>Podcast Public Sound Generator(PPSG)</title>
+  <style>
+    #coverArea { width: 500px; height: 500px; }
+    #coverFrame { width: 100%; height: 100%; border: none; }
+  </style>
 </head>
 
 <body>
@@ -35,7 +39,7 @@
     <button type="submit">ミックスしてダウンロード</button>
   </form>
   <h2>カバーアート</h2>
-  <div id="coverArea"></div>
+  <div id="coverArea"><iframe id="coverFrame"></iframe></div>
   <a id="coverDownload" href="#">カバーアートダウンロード</a>
   <script src="{{ url_for('static', filename='js/preview.js') }}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
