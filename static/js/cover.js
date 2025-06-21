@@ -1,3 +1,4 @@
+// カバーアート関連要素
 const audioInput = document.getElementById('audio');
 const titleInput = document.getElementById('title');
 const genreInput = document.getElementById('genre');
@@ -20,6 +21,7 @@ function loadTemplates() {
     });
 }
 
+// 入力値を送信してカバーアートを再生成
 function updateCover() {
   const files = audioInput.files;
   if (!files.length) return;
@@ -45,12 +47,19 @@ function updateCover() {
     });
 }
 
-audioInput.addEventListener('change', updateCover);
+// 新しいファイルが選択されたらメタ情報をリセット
+audioInput.addEventListener('change', () => {
+  titleInput.value = '';
+  genreInput.value = '';
+  dateInput.value = '';
+  updateCover();
+});
 titleInput.addEventListener('input', updateCover);
 genreInput.addEventListener('input', updateCover);
 templateSelect.addEventListener('change', updateCover);
 dateInput.addEventListener('change', updateCover);
 
+// プレビューをPNG形式でダウンロード
 coverDownload.addEventListener('click', e => {
   e.preventDefault();
   html2canvas(coverFrame.contentDocument.body).then(canvas => {
