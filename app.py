@@ -140,9 +140,9 @@ def cover_art():
   genre = request.form.get('genre') or ''
   tmpl = request.form.get('template') or 'default.html'
   last_modified = request.form.get('last_modified')
+  release_date = request.form.get('date') or None
 
-  release_date = None
-  if file:
+  if not release_date and file:
     m = re.match(r"(\d{4}-\d{2}-\d{2})", file.filename)
     if m:
       release_date = m.group(1)
@@ -179,7 +179,7 @@ def cover_art():
 
 @app.route('/output/<path:filename>')
 def output_file(filename):
-  return send_from_directory(OUTPUT_FOLDER, filename, as_attachment=True)
+  return send_from_directory(OUTPUT_FOLDER, filename)
 
 
 if __name__ == '__main__':

@@ -14,6 +14,8 @@
     <input type="text" id="title"><br><br>
     <label for="genre">ジャンル:</label>
     <input type="text" id="genre"><br><br>
+    <label for="date">配信日:</label>
+    <input type="date" id="date"><br><br>
     <label for="template">カバーアートテンプレート:</label>
     <select id="template"></select><br><br>
     <label for="bgm">BGM:</label>
@@ -36,6 +38,7 @@
   <div id="coverArea"></div>
   <a id="coverDownload" href="#">カバーアートダウンロード</a>
   <script src="{{ url_for('static', filename='js/preview.js') }}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="{{ url_for('static', filename='js/cover.js') }}"></script>
 </body>
 
