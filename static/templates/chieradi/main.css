@@ -32,6 +32,10 @@ article#daytitle {
   flex-direction: column;
 }
 
+article#daytitle>div {
+  margin: auto 0;
+}
+
 .days {
   flex: 1;
 }
