@@ -34,6 +34,7 @@ article#daytitle {
 
 article#daytitle>div {
   margin: auto 0;
+  font-size: 120%;
 }
 
 .days {
@@ -46,7 +47,7 @@ article#daytitle>div {
 
 span#day,
 span#todaystheme {
-  font-size: 50%;
+  font-size: 60%;
 }
 
 /* #endregion day title area */
