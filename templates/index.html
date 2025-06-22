@@ -3,6 +3,7 @@
 
 <head>
   <title>Podcast Public Sound Generator(PPSG)</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
@@ -10,6 +11,14 @@
   <form action="{{ url_for('mix') }}" method="post" enctype="multipart/form-data">
     <label for="audio">ポッドキャスト音声:</label>
     <input type="file" name="audio" id="audio" required><br><br>
+    <label for="title">タイトル:</label>
+    <input type="text" id="title"><br><br>
+    <label for="genre">ジャンル:</label>
+    <input type="text" id="genre"><br><br>
+    <label for="date">配信日:</label>
+    <input type="date" id="date"><br><br>
+    <label for="template">カバーアートテンプレート:</label>
+    <select id="template"></select><br><br>
     <label for="bgm">BGM:</label>
     <select name="bgm" id="bgm" required>
       {% for group_data in options %}
@@ -26,7 +35,12 @@
     <audio id="previewAudio"></audio>
     <button type="submit">ミックスしてダウンロード</button>
   </form>
+  <h2>カバーアート</h2>
+  <div id="coverArea"><iframe id="coverFrame"></iframe></div>
+  <a id="coverDownload" href="#">カバーアートダウンロード</a>
   <script src="{{ url_for('static', filename='js/preview.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/html2canvas.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/cover.js') }}"></script>
 </body>
 
 </html>

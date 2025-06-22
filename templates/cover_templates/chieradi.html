@@ -1,0 +1,42 @@
+<html>
+
+<head>
+  <meta charset='utf-8'>
+  <title>ちえラジChat</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <link rel="stylesheet" href="{{ url_for('static', filename='templates/chieradi/main.css') }}">
+</head>
+
+<body>
+  <article id="daytitle">
+    <div class="days">
+      <div class="text">
+        <span id="day">{{ date }}</span>
+        <span id="week">{{ day }}曜日</span>
+      </div>
+    </div>
+    <div class="theme">
+      <div class="text">
+        {% if genre %}<span id="todaystheme">きょうのテーマは…</span>{% endif %}
+        <span id="theme">{{ genre }}</span>
+      </div>
+    </div>
+  </article>
+  <article id="maintitle">
+    <div>
+      <div class="text">
+        <span id="title">{{ title }}</span>
+      </div>
+    </div>
+  </article>
+  <article id="credit">
+    <div>
+      <div class="text">
+        <span id="chname">ちえラジ Chat</span>
+        <span id="chdest">NPO法人 まちづくりエージェント SIDE BEACH CITY.の高見知英がおくる雑談ラジオ。</span>
+      </div>
+    </div>
+  </article>
+</body>
+
+</html>

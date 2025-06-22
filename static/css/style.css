@@ -1,0 +1,11 @@
+#coverArea {
+  width: 500px;
+  height: 500px;
+  box-sizing: border-box;
+}
+
+#coverFrame {
+  width: 100%;
+  height: 100%;
+  border: none;
+}

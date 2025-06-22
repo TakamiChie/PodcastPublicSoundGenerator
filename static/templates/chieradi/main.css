@@ -1,0 +1,98 @@
+body {
+  background-color: #FFEEDF;
+  background-image: url("./background.png");
+  font-family: "けいふぉんと";
+  font-size: 5vh;
+  padding: 0;
+  margin: 0;
+  width: 500px;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+article {
+  padding: 20px 50px;
+  border: 0 dashed white;
+  box-sizing: border-box;
+}
+
+/* #region day title area */
+
+article#daytitle {
+  flex: 1;
+  background-color: #DFF0FF;
+  border-bottom-width: 1vh;
+  display: flex;
+  flex-direction: row;
+}
+
+#daytitle .text {
+  display: flex;
+  flex-direction: column;
+}
+
+article#daytitle>div {
+  margin: auto 0;
+  font-size: 120%;
+}
+
+.days {
+  flex: 1;
+}
+
+.theme {
+  flex: 2;
+}
+
+span#day,
+span#todaystheme {
+  font-size: 60%;
+}
+
+/* #endregion day title area */
+
+/* #region main title area */
+
+article#maintitle {
+  flex: 2;
+  margin: 5% 0;
+}
+
+#maintitle>div {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+#maintitle .text {
+  margin: auto 0;
+  font-size: 140%;
+}
+
+/* #endregion main title area */
+
+/* #region credit area */
+
+article#credit {
+  border-top-width: 1vh;
+  background-color: #F0FFDF;
+  flex: 1;
+}
+
+#credit .text {
+  background-image: url("/static/templates/chieradi/icon.png");
+  background-repeat: no-repeat;
+  padding-left: 90px;
+}
+
+span#chname {
+  display: block;
+  margin-bottom: 10px;
+}
+
+span#chdest {
+  font-size: 50%;
+}
+
+/* #endregion credit area */
