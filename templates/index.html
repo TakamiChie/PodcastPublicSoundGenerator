@@ -18,7 +18,7 @@
     <label for="date">配信日:</label>
     <input type="date" id="date"><br><br>
     <label for="template">カバーアートテンプレート:</label>
-    <select id="template"></select><br><br>
+    <select id="template" class="savecontrol"></select><br><br>
     <label for="bgm">BGM:</label>
     <select name="bgm" id="bgm" required>
       {% for group_data in options %}
@@ -30,7 +30,7 @@
       {% endfor %}
     </select><br><br>
     <label for="target_db">目標音量(dB):</label>
-    <input type="number" name="target_db" id="target_db" value="{{ target_db }}" step="0.1"><br><br>
+    <input type="number" name="target_db" id="target_db" value="{{ target_db }}" step="0.1" class="savecontrol"><br><br>
     <button type="button" id="previewBtn">BGM視聴</button><br><br>
     <audio id="previewAudio"></audio>
     <button type="submit">ミックスしてダウンロード</button>
@@ -39,6 +39,7 @@
   <div id="coverArea"><iframe id="coverFrame"></iframe></div>
   <a id="coverDownload" href="#">カバーアートダウンロード</a>
   <script src="{{ url_for('static', filename='js/preview.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/savecontrol.js') }}"></script>
   <script src="{{ url_for('static', filename='js/html2canvas.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/cover.js') }}"></script>
 </body>
