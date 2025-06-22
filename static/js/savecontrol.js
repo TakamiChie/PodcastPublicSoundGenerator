@@ -10,6 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (stored !== null) {
         if (ctrl.type === 'checkbox') {
           ctrl.checked = stored === 'true';
+        } else if (ctrl.tagName.toLowerCase() === 'select') {
+          const exists = Array.from(ctrl.options).some(opt => opt.value === stored);
+          if (exists) {
+            ctrl.value = stored;
+          }
         } else {
           ctrl.value = stored;
         }
