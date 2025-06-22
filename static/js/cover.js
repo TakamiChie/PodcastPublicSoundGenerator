@@ -59,10 +59,12 @@ genreInput.addEventListener('input', updateCover);
 templateSelect.addEventListener('change', updateCover);
 dateInput.addEventListener('change', updateCover);
 
-// プレビューをPNG形式でダウンロード
+// PNG形式でダウンロード（3000px×3000px）
 coverDownload.addEventListener('click', e => {
   e.preventDefault();
-  html2canvas(coverFrame.contentDocument.body).then(canvas => {
+  const body = coverFrame.contentDocument.body;
+  const scale = 3000 / body.clientWidth;
+  html2canvas(body, { scale }).then(canvas => {
     const a = document.createElement('a');
     a.href = canvas.toDataURL('image/png');
     a.download = 'cover.png';
