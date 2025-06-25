@@ -32,7 +32,14 @@
     <label for="target_db">目標音量(dB):</label>
     <input type="number" name="target_db" id="target_db" value="{{ target_db }}" step="0.1" class="savecontrol"><br><br>
     <button type="button" id="previewBtn">BGM視聴</button><br><br>
-    <audio id="previewAudio"></audio><br><br>
+    <audio id="previewAudio"></audio><br>
+    <label for="previewRate">再生速度:</label>
+    <select id="previewRate">
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="1.5">1.5x</option>
+      <option value="2">2x</option>
+    </select><br><br>
     <button type="submit">ミックスしてダウンロード</button>
     <div id="mixProgress" class="spinner" style="display:none;"></div><br><br>
   </form>

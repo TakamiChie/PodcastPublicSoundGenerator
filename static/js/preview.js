@@ -1,6 +1,14 @@
 const previewBtn = document.getElementById('previewBtn');
 const bgmSelect = document.getElementById('bgm');
 const previewAudio = document.getElementById('previewAudio');
+const previewRate = document.getElementById('previewRate');
+
+previewAudio.playbackRate = parseFloat(previewRate.value);
+
+// 再生速度変更
+previewRate.addEventListener('change', () => {
+  previewAudio.playbackRate = parseFloat(previewRate.value);
+});
 
 previewBtn.addEventListener('click', () => {
   const selected = bgmSelect.value;
