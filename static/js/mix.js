@@ -1,4 +1,4 @@
-// ミックス処理と再生を自動化
+// ミックス処理を自動化
 const form = document.querySelector('form');
 const audioInput = document.getElementById('audio');
 const mixedAudio = document.getElementById('mixedAudio');
@@ -23,7 +23,6 @@ async function mix() {
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     mixedAudio.src = url;
-    mixedAudio.play();
     mixedDownload.href = url;
   } catch (e) {
     if (e.name !== 'AbortError') {
