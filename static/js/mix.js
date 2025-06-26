@@ -37,9 +37,12 @@
       mixedAudio.playbackRate = parseFloat(mixedRate.value);
       mixedDownload.href = url;
       const disp = res.headers.get('Content-Disposition');
-      const m = disp && disp.match(/filename="(.+)"/);
-      if (m) {
-        mixedDownload.download = m[1];
+      if (disp) {
+        // ヘッダからファイル名を取得（引用符があってもなくても対応）
+        const m = disp.match(/filename\\*?=(?:UTF-8''|\"?)([^\";]+)/);
+        if (m) {
+          mixedDownload.download = m[1];
+        }
       }
     } catch (e) {
       if (e.name !== 'AbortError') {
