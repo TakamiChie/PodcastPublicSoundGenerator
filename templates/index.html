@@ -32,9 +32,22 @@
     <label for="target_db">目標音量(dB):</label>
     <input type="number" name="target_db" id="target_db" value="{{ target_db }}" step="0.1" class="savecontrol"><br><br>
     <button type="button" id="previewBtn">BGM視聴</button><br><br>
-    <audio id="previewAudio"></audio>
-    <button type="submit">ミックスしてダウンロード</button>
+    <audio id="previewAudio"></audio><br>
+    <button type="submit">ミックス音声の再生成</button>
+    <div id="mixProgress" class="spinner" style="display:none;"></div><br><br>
   </form>
+  <h2>ミックス結果</h2>
+  <label for="mixedRate">再生速度:</label>
+  <select id="mixedRate" class="savecontrol">
+    <option value="0.5">0.5x</option>
+    <option value="1" selected>1x</option>
+    <option value="1.5">1.5x</option>
+    <option value="2">2x</option>
+    <option value="3">3x</option>
+    <option value="4">4x</option>
+  </select><br><br>
+  <audio id="mixedAudio" controls></audio><br>
+  <a id="mixedDownload" download="mixed.mp3">ミックス音声ダウンロード</a>
   <h2>カバーアート</h2>
   <div id="coverArea"><iframe id="coverFrame"></iframe></div>
   <a id="coverDownload" href="#">カバーアートダウンロード</a>
@@ -42,6 +55,7 @@
   <script src="{{ url_for('static', filename='js/savecontrol.js') }}"></script>
   <script src="{{ url_for('static', filename='js/html2canvas.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/cover.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/mix.js') }}"></script>
 </body>
 
 </html>
