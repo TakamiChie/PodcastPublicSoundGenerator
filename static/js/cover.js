@@ -45,6 +45,7 @@
             coverFrame.srcdoc = html;
           });
         coverDownload.dataset.url = data.url;
+        coverDownload.dataset.filename = `cover_${data.uuid}.png`;
       });
   }
 
@@ -68,7 +69,7 @@
     html2canvas(body, { scale }).then(canvas => {
       const a = document.createElement('a');
       a.href = canvas.toDataURL('image/png');
-      a.download = 'cover.png';
+      a.download = coverDownload.dataset.filename || 'cover.png';
       a.click();
     });
   });

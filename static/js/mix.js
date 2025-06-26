@@ -23,6 +23,9 @@
     mixProgress.style.display = 'inline-block';
     try {
       const fd = new FormData(form);
+      if (audioInput.files.length) {
+        fd.append('last_modified', audioInput.files[0].lastModified);
+      }
       const res = await fetch(form.action, {
         method: 'POST',
         body: fd,
@@ -33,6 +36,11 @@
       mixedAudio.src = url;
       mixedAudio.playbackRate = parseFloat(mixedRate.value);
       mixedDownload.href = url;
+      const disp = res.headers.get('Content-Disposition');
+      const m = disp && disp.match(/filename="(.+)"/);
+      if (m) {
+        mixedDownload.download = m[1];
+      }
     } catch (e) {
       if (e.name !== 'AbortError') {
         console.error(e);
