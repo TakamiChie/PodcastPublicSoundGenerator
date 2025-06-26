@@ -5,6 +5,13 @@
   const mixedAudio = document.getElementById('mixedAudio');
   const mixedDownload = document.getElementById('mixedDownload');
   const mixProgress = document.getElementById('mixProgress');
+  const mixedRate = document.getElementById('mixedRate');
+
+  // 再生速度変更
+  mixedRate.addEventListener('change', () => {
+    mixedAudio.playbackRate = parseFloat(mixedRate.value);
+  });
+
   let controller = null;
 
   async function mix() {
@@ -24,6 +31,7 @@
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       mixedAudio.src = url;
+      mixedAudio.playbackRate = parseFloat(mixedRate.value);
       mixedDownload.href = url;
     } catch (e) {
       if (e.name !== 'AbortError') {
