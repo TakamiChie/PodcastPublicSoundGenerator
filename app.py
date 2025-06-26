@@ -15,6 +15,19 @@ OUTPUT_FOLDER = os.path.join(os.path.dirname(__file__), 'output')
 os.makedirs(BGM_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
+CURRENT_UUID = None
+CURRENT_SIG = None
+
+
+def update_uuid(file, last_modified):
+  """ファイルが変わったらUUIDを更新"""
+  global CURRENT_UUID, CURRENT_SIG
+  sig = f"{getattr(file, 'filename', '')}:{last_modified}"
+  if sig != CURRENT_SIG:
+    CURRENT_UUID = uuid.uuid4().hex
+    CURRENT_SIG = sig
+  return CURRENT_UUID
+
 
 def get_bgm_options():
   grouped_options = {}  # キー: 表示用ディレクトリ名, 値: option辞書のリスト
@@ -95,6 +108,7 @@ def bgm(filename):
 @app.route('/mix', methods=['POST'])
 def mix():
   file = request.files.get('audio')
+  last_modified = request.form.get('last_modified')
   bgm_name = request.form.get('bgm')
   target_str = request.form.get('target_db', str(DEFAULT_TARGET_DB))
   try:
@@ -118,7 +132,8 @@ def mix():
 
   final_mix = set_bgm(podcast, bgm_name)
 
-  output_name = f"{uuid.uuid4().hex}.mp3"
+  uuid_val = update_uuid(file, last_modified)
+  output_name = f"{uuid_val}.mp3"
   output_path = os.path.join(OUTPUT_FOLDER, output_name)
   final_mix.export(output_path, format='mp3')
 
@@ -129,7 +144,11 @@ def mix():
       tags[k] = v
     tags.save(output_path)
 
-  return send_file(output_path, as_attachment=True, download_name='mixed.mp3')
+  return send_file(
+    output_path,
+    as_attachment=True,
+    download_name=f"mixed_{uuid_val}.mp3"
+  )
 
 
 @app.route('/cover_art', methods=['POST'])
@@ -169,12 +188,14 @@ def cover_art():
   day = days[dt.weekday()]
 
   html = render_template(f'cover_templates/{tmpl}', title=title, date=release_date, day=day, genre=genre)
-  output_name = f"cover_{uuid.uuid4().hex}.html"
+  uuid_val = update_uuid(file, last_modified)
+  output_name = f"cover_{uuid_val}.html"
   output_path = os.path.join(OUTPUT_FOLDER, output_name)
   with open(output_path, 'w', encoding='utf-8') as f:
     f.write(html)
 
-  return jsonify({'title': title, 'genre': genre, 'date': release_date, 'day': day, 'url': url_for('output_file', filename=output_name)})
+  return jsonify({'title': title, 'genre': genre, 'date': release_date, 'day': day,
+                  'url': url_for('output_file', filename=output_name), 'uuid': uuid_val})
 
 
 @app.route('/output/<path:filename>')
