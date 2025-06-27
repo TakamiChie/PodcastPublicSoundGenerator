@@ -47,6 +47,10 @@
       <input type="number" name="target_db" id="target_db" value="{{ target_db }}" step="0.1" class="savecontrol">
     </div>
     <div class="form-item">
+      <button type="submit">ミックス音声の再生成</button>
+      <div id="mixProgress" class="spinner" style="display:none;"></div>
+    </div>
+    <div class="form-item">
       <audio id="previewAudio"></audio>
     </div>
   </form>
@@ -64,10 +68,6 @@
   </div>
   <div class="form-item">
     <audio id="mixedAudio" controls></audio>
-  </div>
-  <div class="form-item">
-    <button type="submit">ミックス音声の再生成</button>
-    <div id="mixProgress" class="spinner" style="display:none;"></div>
   </div>
   <a id="mixedDownload" download="mixed.mp3">ミックス音声ダウンロード</a>
   <h2>カバーアート</h2>
