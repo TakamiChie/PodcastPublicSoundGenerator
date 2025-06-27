@@ -30,7 +30,7 @@
     const select = document.getElementById('bgm');
     let fallback = null;
     for (const opt of select.options) {
-      const fname = opt.value.split('/').pop();
+      const fname = opt.value;
       const m = fname.match(/bgm_(\d{2})(\d{2})?/);
       if (!m) continue;
       if (m[1] !== dayNo) continue;
