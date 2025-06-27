@@ -24,3 +24,34 @@
     transform: rotate(360deg);
   }
 }
+
+.form-item {
+  margin-bottom: 1em;
+  display: flex;
+  align-items: center;
+}
+
+/* ラベルと入力を2列で表示 */
+.form-item > label {
+  width: 8em;
+  flex-shrink: 0;
+  padding-right: 0.5em;
+}
+
+/* 入力要素は行全体を使う */
+.form-item > input,
+.form-item > select,
+.form-item > audio {
+  flex: 1;
+}
+
+/* ラベルがない要素は位置を合わせる */
+.form-item > button,
+.form-item > audio:first-child {
+  margin-left: calc(8em + 0.5em);
+}
+
+/* BGM行ではボタンを選択欄の横に配置 */
+.form-inline > button {
+  margin-left: 0.5em;
+}
