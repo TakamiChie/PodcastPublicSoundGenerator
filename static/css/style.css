@@ -50,3 +50,8 @@
 .form-item > audio:first-child {
   margin-left: calc(8em + 0.5em);
 }
+
+/* BGM行ではボタンを選択欄の横に配置 */
+.form-inline > button {
+  margin-left: 0.5em;
+}
