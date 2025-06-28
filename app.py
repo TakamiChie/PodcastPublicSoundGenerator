@@ -8,8 +8,8 @@ from mutagen import File as MutagenFile
 from pydub import AudioSegment
 from work import set_bgm, normalize_volume, DEFAULT_TARGET_DB
 
-# コメントフレームを扱うために登録
-EasyID3.RegisterTextKey('comment', 'COMM')
+# descriptionフレームを扱うために登録
+EasyID3.RegisterTextKey('description', 'TIT3')
 
 app = Flask(__name__)
 BGM_FOLDER = os.path.join(os.path.dirname(__file__), 'bgm')
@@ -138,7 +138,7 @@ def mix():
   title = request.form.get('title') or ''
   genre = request.form.get('genre') or ''
   artist = request.form.get('artist') or ''
-  comment = request.form.get('comment') or ''
+  description = request.form.get('description') or ''
   release_date = request.form.get('date') or None
   target_str = request.form.get('target_db', str(DEFAULT_TARGET_DB))
   try:
@@ -181,8 +181,8 @@ def mix():
     tags['genre'] = genre
   if artist:
     tags['artist'] = artist
-  if comment:
-    tags['comment'] = comment
+  if description:
+    tags['description'] = description
   if album:
     tags['album'] = album
   if release_date:
@@ -252,7 +252,7 @@ def archive():
   title = request.form.get('title') or ''
   genre = request.form.get('genre') or ''
   artist = request.form.get('artist') or ''
-  comment = request.form.get('comment') or ''
+  description = request.form.get('description') or ''
   bgm_name = request.form.get('bgm') or ''
   release_date = request.form.get('date') or None
   last_modified = request.form.get('last_modified')
@@ -273,8 +273,8 @@ def archive():
     tags['genre'] = genre
   if artist:
     tags['artist'] = artist
-  if comment:
-    tags['comment'] = comment
+  if description:
+    tags['description'] = description
   if album:
     tags['album'] = album
   tags['date'] = str(datetime.now().year)
