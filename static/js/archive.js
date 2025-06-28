@@ -3,7 +3,6 @@
   const titleInput = document.getElementById('title');
   const genreInput = document.getElementById('genre');
   const artistInput = document.getElementById('artist');
-  const descriptionInput = document.getElementById('description');
   const dateInput = document.getElementById('date');
   const bgmSelect = document.getElementById('bgm');
   const archiveLink = document.getElementById('archiveDownload');
@@ -17,7 +16,6 @@
     fd.append('title', titleInput.value);
     fd.append('genre', genreInput.value);
     fd.append('artist', artistInput.value);
-    fd.append('description', descriptionInput.value);
     fd.append('date', dateInput.value);
     fd.append('bgm', bgmSelect.value);
     fd.append('last_modified', file.lastModified);
