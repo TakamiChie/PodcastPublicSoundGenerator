@@ -46,6 +46,7 @@
       <label for="target_db">目標音量(dB):</label>
       <input type="number" name="target_db" id="target_db" value="{{ target_db }}" step="0.1" class="savecontrol">
     </div>
+    <a id="archiveDownload" href="#">アーカイブ音声ダウンロード</a>
     <div class="form-item">
       <button type="submit">ミックス音声の再生成</button>
       <div id="mixProgress" class="spinner" style="display:none;"></div>
@@ -70,7 +71,6 @@
     <audio id="mixedAudio" controls></audio>
   </div>
   <a id="mixedDownload" download="mixed.mp3">ミックス音声ダウンロード</a>
-  <a id="archiveDownload" href="#">アーカイブ音声ダウンロード</a>
   <h2>カバーアート</h2>
   <div id="coverArea"><iframe id="coverFrame"></iframe></div>
   <a id="coverDownload" href="#">カバーアートダウンロード</a>
