@@ -70,6 +70,7 @@
     <audio id="mixedAudio" controls></audio>
   </div>
   <a id="mixedDownload" download="mixed.mp3">ミックス音声ダウンロード</a>
+  <a id="archiveDownload" href="#">アーカイブ音声ダウンロード</a>
   <h2>カバーアート</h2>
   <div id="coverArea"><iframe id="coverFrame"></iframe></div>
   <a id="coverDownload" href="#">カバーアートダウンロード</a>
@@ -78,6 +79,7 @@
   <script src="{{ url_for('static', filename='js/html2canvas.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/cover.js') }}"></script>
   <script src="{{ url_for('static', filename='js/mix.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/archive.js') }}"></script>
 </body>
 
 </html>

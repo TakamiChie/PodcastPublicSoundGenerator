@@ -29,6 +29,28 @@ def update_uuid(file, last_modified):
   return CURRENT_UUID
 
 
+def get_album_name(bgm_path: str) -> str:
+  """BGMファイルからアルバム名(親フォルダ)を取得"""
+  parts = re.split(r'[\\/]', bgm_path)
+  if len(parts) >= 2:
+    return parts[-2]
+  return ''
+
+
+def extract_release_date(file, last_modified, release_date):
+  """入力から配信日を決定"""
+  if not release_date and file:
+    m = re.match(r"(\d{4}-\d{2}-\d{2})", file.filename)
+    if m:
+      release_date = m.group(1)
+    elif last_modified:
+      dt = datetime.fromtimestamp(int(last_modified) / 1000)
+      release_date = dt.strftime('%Y-%m-%d')
+  if not release_date:
+    release_date = datetime.now().strftime('%Y-%m-%d')
+  return release_date
+
+
 def get_bgm_options():
   grouped_options = {}  # キー: 表示用ディレクトリ名, 値: option辞書のリスト
   for root, _, files in os.walk(BGM_FOLDER):
@@ -196,6 +218,44 @@ def cover_art():
 
   return jsonify({'title': title, 'genre': genre, 'date': release_date, 'day': day,
                   'url': url_for('output_file', filename=output_name), 'uuid': uuid_val})
+
+
+@app.route('/archive', methods=['POST'])
+def archive():
+  """BGMなしのアーカイブ用MP3を生成"""
+  file = request.files.get('audio')
+  if not file:
+    return redirect(url_for('index'))
+  title = request.form.get('title') or ''
+  genre = request.form.get('genre') or ''
+  bgm_name = request.form.get('bgm') or ''
+  release_date = request.form.get('date') or None
+  last_modified = request.form.get('last_modified')
+
+  release_date = extract_release_date(file, last_modified, release_date)
+  album = get_album_name(bgm_name)
+
+  file.stream.seek(0)
+  podcast = AudioSegment.from_file(file)
+  output_name = f"{release_date}.mp3"
+  output_path = os.path.join(OUTPUT_FOLDER, output_name)
+  podcast.export(output_path, format='mp3')
+
+  tags = EasyID3()
+  if title:
+    tags['title'] = title
+  if genre:
+    tags['genre'] = genre
+  if album:
+    tags['album'] = album
+  tags['date'] = str(datetime.now().year)
+  tags.save(output_path)
+
+  return send_file(
+    output_path,
+    as_attachment=True,
+    download_name=output_name
+  )
 
 
 @app.route('/output/<path:filename>')
