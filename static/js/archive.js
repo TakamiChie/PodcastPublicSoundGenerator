@@ -2,6 +2,8 @@
   const audioInput = document.getElementById('audio');
   const titleInput = document.getElementById('title');
   const genreInput = document.getElementById('genre');
+  const artistInput = document.getElementById('artist');
+  const commentInput = document.getElementById('comment');
   const dateInput = document.getElementById('date');
   const bgmSelect = document.getElementById('bgm');
   const archiveLink = document.getElementById('archiveDownload');
@@ -14,6 +16,8 @@
     fd.append('audio', file);
     fd.append('title', titleInput.value);
     fd.append('genre', genreInput.value);
+    fd.append('artist', artistInput.value);
+    fd.append('comment', commentInput.value);
     fd.append('date', dateInput.value);
     fd.append('bgm', bgmSelect.value);
     fd.append('last_modified', file.lastModified);
