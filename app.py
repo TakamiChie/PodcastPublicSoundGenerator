@@ -132,6 +132,9 @@ def mix():
   file = request.files.get('audio')
   last_modified = request.form.get('last_modified')
   bgm_name = request.form.get('bgm')
+  title = request.form.get('title') or ''
+  genre = request.form.get('genre') or ''
+  release_date = request.form.get('date') or None
   target_str = request.form.get('target_db', str(DEFAULT_TARGET_DB))
   try:
     target_db = float(target_str)
@@ -139,6 +142,9 @@ def mix():
     target_db = DEFAULT_TARGET_DB
   if not file or not bgm_name:
     return redirect(url_for('index'))
+
+  release_date = extract_release_date(file, last_modified, release_date)
+  album = get_album_name(bgm_name)
 
   # 入力音声のID3タグを取得
   try:
@@ -159,12 +165,20 @@ def mix():
   output_path = os.path.join(OUTPUT_FOLDER, output_name)
   final_mix.export(output_path, format='mp3')
 
-  # 取得したID3タグを出力ファイルに設定
+  # 取得したID3タグとフォーム入力を出力ファイルに設定
+  tags = EasyID3()
   if orig_tags:
-    tags = EasyID3()
     for k, v in orig_tags.items():
       tags[k] = v
-    tags.save(output_path)
+  if title:
+    tags['title'] = title
+  if genre:
+    tags['genre'] = genre
+  if album:
+    tags['album'] = album
+  if release_date:
+    tags['date'] = release_date
+  tags.save(output_path)
 
   return send_file(
     output_path,
