@@ -46,6 +46,7 @@
       <label for="target_db">目標音量(dB):</label>
       <input type="number" name="target_db" id="target_db" value="{{ target_db }}" step="0.1" class="savecontrol">
     </div>
+    <a id="archiveDownload" href="#">アーカイブ音声ダウンロード</a>
     <div class="form-item">
       <button type="submit">ミックス音声の再生成</button>
       <div id="mixProgress" class="spinner" style="display:none;"></div>
@@ -78,6 +79,7 @@
   <script src="{{ url_for('static', filename='js/html2canvas.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/cover.js') }}"></script>
   <script src="{{ url_for('static', filename='js/mix.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/archive.js') }}"></script>
 </body>
 
 </html>
