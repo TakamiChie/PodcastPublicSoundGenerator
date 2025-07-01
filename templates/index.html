@@ -39,7 +39,7 @@
         {% for group_data in options %}
         <optgroup label="{{ group_data.group_label }}">
           {% for opt in group_data.options %}
-          <option value="{{ opt.file }}">{{ opt.label }}({{ opt.stem }})</option>
+          <option value="{{ opt.file }}" data-basename="{{ opt.basename }}">{{ opt.label }}({{ opt.stem }})</option>
           {% endfor %}
         </optgroup>
         {% endfor %}
