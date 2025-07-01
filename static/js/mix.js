@@ -125,7 +125,6 @@
 
   form.addEventListener('submit', e => {
     e.preventDefault();
-    autoSelectBgm();
     mix();
   });
 
