@@ -85,7 +85,12 @@ def get_bgm_options():
 
       if group_label not in grouped_options:
         grouped_options[group_label] = []
-      grouped_options[group_label].append({'file': file_value, 'label': label, 'stem': fname_leaf})
+      grouped_options[group_label].append({
+        'file': file_value,
+        'label': label,
+        'stem': fname_leaf,
+        'basename': os.path.splitext(fname_leaf)[0]
+      })
 
   # テンプレートで使いやすいように整形し、ソートする
   options_for_template = []

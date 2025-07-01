@@ -50,10 +50,31 @@
     return false;
   }
 
+  // ファイル名に含まれるBGM名から選択
+  function selectBgmByName(fileName) {
+    const select = document.getElementById('bgm');
+    const baseName = fileName.replace(/\.[^/.]+$/, '').toLowerCase();
+    let bestOpt = null;
+    let bestLen = 0;
+    for (const opt of select.options) {
+      const bn = (opt.dataset.basename || '').toLowerCase();
+      if (bn && baseName.includes(bn) && bn.length > bestLen) {
+        bestOpt = opt;
+        bestLen = bn.length;
+      }
+    }
+    if (bestOpt) {
+      select.value = bestOpt.value;
+      return true;
+    }
+    return false;
+  }
+
   // #audio に設定されたファイル名からBGMを自動選択
   function autoSelectBgm() {
     if (!audioInput.files.length) return;
     const name = audioInput.files[0].name;
+    if (selectBgmByName(name)) return;
     const m = name.match(/^(\d{4}-\d{2}-\d{2})/);
     if (!m) return;
     const date = new Date(m[1]);
@@ -104,7 +125,6 @@
 
   form.addEventListener('submit', e => {
     e.preventDefault();
-    autoSelectBgm();
     mix();
   });
 
