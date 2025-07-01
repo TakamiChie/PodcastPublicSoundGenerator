@@ -54,12 +54,18 @@
   function selectBgmByName(fileName) {
     const select = document.getElementById('bgm');
     const baseName = fileName.replace(/\.[^/.]+$/, '').toLowerCase();
+    let bestOpt = null;
+    let bestLen = 0;
     for (const opt of select.options) {
       const bn = (opt.dataset.basename || '').toLowerCase();
-      if (bn && baseName.includes(bn)) {
-        select.value = opt.value;
-        return true;
+      if (bn && baseName.includes(bn) && bn.length > bestLen) {
+        bestOpt = opt;
+        bestLen = bn.length;
       }
+    }
+    if (bestOpt) {
+      select.value = bestOpt.value;
+      return true;
     }
     return false;
   }
