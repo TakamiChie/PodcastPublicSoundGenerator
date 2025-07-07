@@ -44,6 +44,11 @@ div#coverArea {
   }
 }
 
+#mixProgress {
+  display: none;
+  margin-left: 0.5em;
+}
+
 .form-item {
   margin-bottom: 1em;
   display: flex;
