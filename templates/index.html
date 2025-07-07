@@ -8,76 +8,84 @@
 
 <body>
   <h1>Podcast Public Sound Generator(PPSG)</h1>
-  <form action="{{ url_for('mix') }}" method="post" enctype="multipart/form-data">
-    <div class="form-item">
-      <label for="audio">ポッドキャスト音声:</label>
-      <input type="file" name="audio" id="audio" required>
-    </div>
-    <div class="form-item">
-      <label for="title">タイトル:</label>
-      <input type="text" id="title" name="title">
-    </div>
-    <div class="form-item">
-      <label for="genre">ジャンル:</label>
-      <input type="text" id="genre" name="genre">
-    </div>
-    <div class="form-item">
-      <label for="artist">アーティスト:</label>
-      <input type="text" id="artist" name="artist" class="savecontrol">
-    </div>
-    <div class="form-item">
-      <label for="date">配信日:</label>
-      <input type="date" id="date" name="date">
-    </div>
-    <div class="form-item">
-      <label for="template">カバーアートテンプレート:</label>
-      <select id="template" class="savecontrol"></select>
-    </div>
-    <div class="form-item form-inline">
-      <label for="bgm">BGM:</label>
-      <select name="bgm" id="bgm" required>
-        {% for group_data in options %}
-        <optgroup label="{{ group_data.group_label }}">
-          {% for opt in group_data.options %}
-          <option value="{{ opt.file }}" data-basename="{{ opt.basename }}">{{ opt.label }}({{ opt.stem }})</option>
+  <div id="container">
+    <form action="{{ url_for('mix') }}" method="post" enctype="multipart/form-data">
+      <div class="form-item">
+        <label for="audio">ポッドキャスト音声:</label>
+        <input type="file" name="audio" id="audio" required>
+      </div>
+      <div class="form-item">
+        <label for="title">タイトル:</label>
+        <input type="text" id="title" name="title">
+      </div>
+      <div class="form-item">
+        <label for="genre">ジャンル:</label>
+        <input type="text" id="genre" name="genre">
+      </div>
+      <div class="form-item">
+        <label for="artist">アーティスト:</label>
+        <input type="text" id="artist" name="artist" class="savecontrol">
+      </div>
+      <div class="form-item">
+        <label for="date">配信日:</label>
+        <input type="date" id="date" name="date">
+      </div>
+      <div class="form-item">
+        <label for="template">カバーアートテンプレート:</label>
+        <select id="template" class="savecontrol"></select>
+      </div>
+      <div class="form-item form-inline">
+        <label for="bgm">BGM:</label>
+        <select name="bgm" id="bgm" required>
+          {% for group_data in options %}
+          <optgroup label="{{ group_data.group_label }}">
+            {% for opt in group_data.options %}
+            <option value="{{ opt.file }}" data-basename="{{ opt.basename }}">{{ opt.label }}({{ opt.stem }})</option>
+            {% endfor %}
+          </optgroup>
           {% endfor %}
-        </optgroup>
-        {% endfor %}
-      </select>
-      <button type="button" id="previewBtn" class="preview-btn">BGM視聴</button>
+        </select>
+        <button type="button" id="previewBtn" class="preview-btn">BGM視聴</button>
+      </div>
+      <div class="form-item">
+        <label for="target_db">目標音量(dB):</label>
+        <input type="number" name="target_db" id="target_db" value="{{ target_db }}" step="0.1" class="savecontrol">
+      </div>
+      <a id="archiveDownload" href="#">アーカイブ音声ダウンロード</a>
+      <div class="form-item">
+        <button type="submit">ミックス音声の再生成</button>
+        <div id="mixProgress" class="spinner" style="display:none;"></div>
+      </div>
+      <div class="form-item">
+        <audio id="previewAudio"></audio>
+      </div>
+    </form>
+    <div id="resultArea">
+      <div id="mixAudio">
+        <h2>ミックス結果</h2>
+        <div class="form-item">
+          <label for="mixedRate">再生速度:</label>
+          <select id="mixedRate" class="savecontrol">
+            <option value="0.5">0.5x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+            <option value="3">3x</option>
+            <option value="4">4x</option>
+          </select>
+        </div>
+        <div class="form-item">
+          <audio id="mixedAudio" controls></audio>
+        </div>
+        <a id="mixedDownload" download="mixed.mp3">ミックス音声ダウンロード</a>
+      </div>
+      <div id="coverArt">
+        <h2>カバーアート</h2>
+        <div id="coverArea"><iframe title="カバーアートプレビュー" id="coverFrame"></iframe></div>
+        <a id="coverDownload" href="#">カバーアートダウンロード</a>
+      </div>
     </div>
-    <div class="form-item">
-      <label for="target_db">目標音量(dB):</label>
-      <input type="number" name="target_db" id="target_db" value="{{ target_db }}" step="0.1" class="savecontrol">
-    </div>
-    <a id="archiveDownload" href="#">アーカイブ音声ダウンロード</a>
-    <div class="form-item">
-      <button type="submit">ミックス音声の再生成</button>
-      <div id="mixProgress" class="spinner" style="display:none;"></div>
-    </div>
-    <div class="form-item">
-      <audio id="previewAudio"></audio>
-    </div>
-  </form>
-  <h2>ミックス結果</h2>
-  <div class="form-item">
-    <label for="mixedRate">再生速度:</label>
-    <select id="mixedRate" class="savecontrol">
-      <option value="0.5">0.5x</option>
-      <option value="1" selected>1x</option>
-      <option value="1.5">1.5x</option>
-      <option value="2">2x</option>
-      <option value="3">3x</option>
-      <option value="4">4x</option>
-    </select>
   </div>
-  <div class="form-item">
-    <audio id="mixedAudio" controls></audio>
-  </div>
-  <a id="mixedDownload" download="mixed.mp3">ミックス音声ダウンロード</a>
-  <h2>カバーアート</h2>
-  <div id="coverArea"><iframe id="coverFrame"></iframe></div>
-  <a id="coverDownload" href="#">カバーアートダウンロード</a>
   <script src="{{ url_for('static', filename='js/preview.js') }}"></script>
   <script src="{{ url_for('static', filename='js/savecontrol.js') }}"></script>
   <script src="{{ url_for('static', filename='js/html2canvas.min.js') }}"></script>

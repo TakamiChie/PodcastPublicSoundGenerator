@@ -1,6 +1,25 @@
-#coverArea {
-  width: 500px;
-  height: 500px;
+@media screen and (min-width: 1100px) {
+  div#container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+}
+
+h1 {
+  border-bottom: 2px solid black;
+  padding: 4px 0;
+}
+
+h2 {
+  border-bottom: 1px solid black;
+  padding: 2px 0;
+}
+
+div#coverArea {
+  border: 3px solid black;
+  width: 506px;
+  height: 506px;
   box-sizing: border-box;
 }
 
@@ -31,27 +50,31 @@
   align-items: center;
 }
 
+form .form-item {
+  margin-bottom: 2em;
+}
+
 /* ラベルと入力を2列で表示 */
-.form-item > label {
+.form-item>label {
   width: 8em;
   flex-shrink: 0;
   padding-right: 0.5em;
 }
 
 /* 入力要素は行全体を使う */
-.form-item > input,
-.form-item > select,
-.form-item > audio {
+.form-item>input,
+.form-item>select,
+.form-item>audio {
   flex: 1;
 }
 
 /* ラベルがない要素は位置を合わせる */
-.form-item > button,
-.form-item > audio:first-child {
+.form-item>button,
+.form-item>audio:first-child {
   margin-left: calc(8em + 0.5em);
 }
 
 /* BGM行ではボタンを選択欄の横に配置 */
-.form-inline > button {
+.form-inline>button {
   margin-left: 0.5em;
 }
