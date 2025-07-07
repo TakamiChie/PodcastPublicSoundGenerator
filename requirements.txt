@@ -1,3 +1,4 @@
 Flask
 mutagen
 pydub
+wfastcgi

@@ -289,5 +289,9 @@ def output_file(filename):
   return send_from_directory(OUTPUT_FOLDER, filename)
 
 
+# WSGIサーバー用エイリアス
+application = app
+
+
 if __name__ == '__main__':
   app.run(debug=True)
