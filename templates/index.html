@@ -9,7 +9,7 @@
 <body>
   <h1>Podcast Public Sound Generator(PPSG)</h1>
   <div id="container">
-    <form action="{{ url_for('mix') }}" method="post" enctype="multipart/form-data">
+    <form action="{{ url_for('mix') }}" method="post" enctype="multipart/form-data" id="mixForm">
       <div class="form-item">
         <label for="audio">ポッドキャスト音声:</label>
         <input type="file" name="audio" id="audio" required>
@@ -53,10 +53,6 @@
       </div>
       <a id="archiveDownload" href="#">アーカイブ音声ダウンロード</a>
       <div class="form-item">
-        <button type="submit">ミックス音声の再生成</button>
-        <div id="mixProgress" class="spinner" style="display:none;"></div>
-      </div>
-      <div class="form-item">
         <audio id="previewAudio"></audio>
       </div>
     </form>
@@ -78,6 +74,10 @@
           <audio id="mixedAudio" controls></audio>
         </div>
         <a id="mixedDownload" download="mixed.mp3">ミックス音声ダウンロード</a>
+        <div class="form-item">
+          <button type="submit" form="mixForm">ミックス音声の再生成</button>
+          <div id="mixProgress" class="spinner" style="display:none;"></div>
+        </div>
       </div>
       <div id="coverArt">
         <h2>カバーアート</h2>
