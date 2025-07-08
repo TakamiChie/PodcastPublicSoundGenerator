@@ -288,6 +288,11 @@ def archive():
 def output_file(filename):
   return send_from_directory(OUTPUT_FOLDER, filename)
 
+@app.route('/health')
+def health_check():
+  return "OK", 200
 
 if __name__ == '__main__':
-  app.run(debug=True)
+  port = int(os.environ.get('PORT', 8000))  # Azure が渡す PORT 環境変数を取得
+  debug_mode = os.environ.get('FLASK_DEBUG', 'true').lower() == 'true'
+  app.run(host='0.0.0.0', port=port, debug=debug_mode)
