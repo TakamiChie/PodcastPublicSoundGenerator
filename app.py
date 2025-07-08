@@ -5,9 +5,25 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, send_file, send_from_directory, jsonify
 from mutagen.easyid3 import EasyID3
 from mutagen import File as MutagenFile
-from pydub import AudioSegment
+from pydub import AudioSegment, utils
 from work import set_bgm, normalize_volume, DEFAULT_TARGET_DB
 
+# デフォルトは環境変数 or システムパス
+ffmpeg_binary = os.environ.get("FFMPEG_BINARY", "ffmpeg")
+ffprobe_binary = os.environ.get("FFPROBE_BINARY", "ffprobe")
+
+# もし同梱された bin/ffmpeg が存在すればそれを優先
+local_ffmpeg_path = os.path.join(os.path.dirname(__file__), "bin", "ffmpeg")
+local_ffprobe_path = os.path.join(os.path.dirname(__file__), "bin", "ffprobe")
+
+if os.path.isfile(local_ffmpeg_path):
+  ffmpeg_binary = local_ffmpeg_path
+if os.path.isfile(local_ffprobe_path):
+  ffprobe_binary = local_ffprobe_path
+
+# pydub に適用
+AudioSegment.converter = utils.which(ffmpeg_binary)
+AudioSegment.ffprobe = utils.which(ffprobe_binary)
 
 app = Flask(__name__)
 BGM_FOLDER = os.path.join(os.path.dirname(__file__), 'bgm')
