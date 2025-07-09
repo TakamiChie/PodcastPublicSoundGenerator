@@ -11,15 +11,16 @@ from work import set_bgm, normalize_volume, DEFAULT_TARGET_DB
 # デフォルトは環境変数 or システムパス
 ffmpeg_binary = os.environ.get("FFMPEG_BINARY", "ffmpeg")
 ffprobe_binary = os.environ.get("FFPROBE_BINARY", "ffprobe")
-
-# もし同梱された bin/ffmpeg が存在すればそれを優先
-local_ffmpeg_path = os.path.join(os.path.dirname(__file__), "bin", "ffmpeg")
-local_ffprobe_path = os.path.join(os.path.dirname(__file__), "bin", "ffprobe")
-
-if os.path.isfile(local_ffmpeg_path):
-  ffmpeg_binary = local_ffmpeg_path
-if os.path.isfile(local_ffprobe_path):
-  ffprobe_binary = local_ffprobe_path
+if ffmpeg_binary and ffprobe_binary:
+  pass
+else:
+  # もし同梱された bin/ffmpeg が存在すればそれを優先
+  local_ffmpeg_path = os.path.join(os.path.dirname(__file__), "bin", "ffmpeg")
+  local_ffprobe_path = os.path.join(os.path.dirname(__file__), "bin", "ffprobe")
+  if os.path.isfile(local_ffmpeg_path):
+    ffmpeg_binary = local_ffmpeg_path
+  if os.path.isfile(local_ffprobe_path):
+    ffprobe_binary = local_ffprobe_path
 
 # pydub に適用
 AudioSegment.converter = utils.which(ffmpeg_binary)
