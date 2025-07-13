@@ -22,6 +22,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # デフォルトポート（例：Flaskで8000番使用）
 EXPOSE 8000
 
+# 環境変数で「コンテナ実行中」であることを明示
+ENV RUNNING_IN_CONTAINER=1
+
 # アプリ起動（必要に応じて書き換え）
 CMD ["python", "app.py"]
 
