@@ -2,5 +2,7 @@ output/
 node_modules/
 __pycache__/
 *.pyc
+bgm/**/*.mp3
+!bgm/*.mp3
 bin/ffmpeg
 bin/ffprobe
