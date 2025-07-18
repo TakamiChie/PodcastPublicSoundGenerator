@@ -289,6 +289,10 @@ def output_file(filename):
   return send_from_directory(OUTPUT_FOLDER, filename)
 
 
+# WSGIサーバー用エイリアス
+application = app
+
+
 if __name__ == '__main__':
   if os.getenv("RUNNING_IN_CONTAINER") == "1":
     app.run(host="0.0.0.0", port=8000)
