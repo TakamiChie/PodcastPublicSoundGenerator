@@ -56,8 +56,9 @@
     dateInput.value = '';
     updateCover();
   });
-  titleInput.addEventListener('input', updateCover);
-  genreInput.addEventListener('input', updateCover);
+  // テキストボックスからフォーカスが外れたときに更新
+  titleInput.addEventListener('blur', updateCover);
+  genreInput.addEventListener('blur', updateCover);
   templateSelect.addEventListener('change', updateCover);
   dateInput.addEventListener('change', updateCover);
 
