@@ -143,6 +143,7 @@ def mix():
   artist = request.form.get('artist') or ''
   release_date = request.form.get('date') or None
   target_str = request.form.get('target_db', str(DEFAULT_TARGET_DB))
+  noise_reduction = request.form.get('noise_reduction', 'none')
   try:
     target_db = float(target_str)
   except ValueError:
@@ -163,7 +164,8 @@ def mix():
 
   file.stream.seek(0)
   podcast = AudioSegment.from_file(file)
-  podcast = reduce_noise(podcast)
+  if noise_reduction and noise_reduction == "1stOne":
+    podcast = reduce_noise(podcast)
   podcast = normalize_volume(podcast, target_db)
 
   final_mix = set_bgm(podcast, bgm_name)
