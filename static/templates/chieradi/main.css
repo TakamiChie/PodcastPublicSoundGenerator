@@ -1,7 +1,13 @@
+@font-face {
+  font-family: keifont;
+  src: url(./keifont.ttf) format("truetype");
+  font-display: block;
+}
+
 body {
   background-color: #FFEEDF;
   background-image: url("./background.png");
-  font-family: "けいふぉんと";
+  font-family: keifont;
   font-size: 5vh;
   padding: 0;
   margin: 0;
