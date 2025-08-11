@@ -1,7 +1,33 @@
 import os
+import numpy as np
+import noisereduce as nr
 from pydub import AudioSegment
 
 DEFAULT_TARGET_DB = 80.0
+
+
+def reduce_noise(audio: AudioSegment, sample_duration_ms: int = 1000) -> AudioSegment:
+  """最初のsample_duration_msミリ秒をノイズとして抽出し、全体から除去する。"""
+  if len(audio) <= sample_duration_ms:
+    return audio
+  noise_sample = audio[:sample_duration_ms]
+  dtype_map = {1: np.int8, 2: np.int16, 4: np.int32}
+  sample_width = audio.sample_width
+  dtype = dtype_map.get(sample_width, np.int16)
+  audio_np = np.array(audio.get_array_of_samples()).astype(np.float32)
+  noise_np = np.array(noise_sample.get_array_of_samples()).astype(np.float32)
+  channels = audio.channels
+  if channels > 1:
+    audio_np = audio_np.reshape((-1, channels))
+    noise_np = noise_np.reshape((-1, channels))
+    reduced = np.empty_like(audio_np)
+    for ch in range(channels):
+      reduced[:, ch] = nr.reduce_noise(y=audio_np[:, ch], sr=audio.frame_rate, y_noise=noise_np[:, ch])
+    reduced = reduced.reshape((-1,))
+  else:
+    reduced = nr.reduce_noise(y=audio_np, sr=audio.frame_rate, y_noise=noise_np)
+  reduced = np.clip(reduced, np.iinfo(dtype).min, np.iinfo(dtype).max)
+  return audio._spawn(reduced.astype(dtype).tobytes())
 
 
 def normalize_volume(audio: AudioSegment, target_db: float = DEFAULT_TARGET_DB) -> AudioSegment:

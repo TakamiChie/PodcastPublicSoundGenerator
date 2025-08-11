@@ -1,3 +1,5 @@
 Flask
 mutagen
 pydub
+numpy
+noisereduce
