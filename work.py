@@ -12,6 +12,11 @@ def normalize_volume(audio: AudioSegment, target_db: float = DEFAULT_TARGET_DB) 
   gain = target_dbfs - audio.dBFS
   return audio.apply_gain(gain)
 
+
+def reduce_noise(audio: AudioSegment) -> AudioSegment:
+  """簡易ノイズ除去: 低周波ノイズを抑制"""
+  return audio.high_pass_filter(200)
+
 BGM_FOLDER = os.path.join(os.path.dirname(__file__), 'bgm')
 BGM_DUCK_DB = -20.0 # BGMをポッドキャスト再生中に10%の音量にする（約-20dB） 20 * log10(0.1) = -20 dB
 

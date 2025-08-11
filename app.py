@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for, send_file,
 from mutagen.easyid3 import EasyID3
 from mutagen import File as MutagenFile
 from pydub import AudioSegment
-from work import set_bgm, normalize_volume, DEFAULT_TARGET_DB
+from work import set_bgm, normalize_volume, DEFAULT_TARGET_DB, reduce_noise
 
 
 app = Flask(__name__)
@@ -143,6 +143,7 @@ def mix():
   artist = request.form.get('artist') or ''
   release_date = request.form.get('date') or None
   target_str = request.form.get('target_db', str(DEFAULT_TARGET_DB))
+  noise_reduction = request.form.get('noise_reduction')
   try:
     target_db = float(target_str)
   except ValueError:
@@ -164,6 +165,9 @@ def mix():
   file.stream.seek(0)
   podcast = AudioSegment.from_file(file)
   podcast = normalize_volume(podcast, target_db)
+  if noise_reduction:
+    # ノイズ除去を適用
+    podcast = reduce_noise(podcast)
 
   final_mix = set_bgm(podcast, bgm_name)
 

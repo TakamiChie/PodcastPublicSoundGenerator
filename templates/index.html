@@ -51,6 +51,10 @@
         <label for="target_db">目標音量(dB):</label>
         <input type="number" name="target_db" id="target_db" value="{{ target_db }}" step="0.1" class="savecontrol">
       </div>
+      <div class="form-item">
+        <label for="noise_reduction">ノイズ除去:</label>
+        <input type="checkbox" id="noise_reduction" name="noise_reduction">
+      </div>
       <a id="archiveDownload" href="#">アーカイブ音声ダウンロード</a>
       <div class="form-item">
         <audio id="previewAudio"></audio>
