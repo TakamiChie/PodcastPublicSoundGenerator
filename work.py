@@ -29,6 +29,9 @@ def reduce_noise(audio: AudioSegment, sample_duration_ms: int = 1000) -> AudioSe
   reduced = np.clip(reduced, np.iinfo(dtype).min, np.iinfo(dtype).max)
   return audio._spawn(reduced.astype(dtype).tobytes())
 
+def highpass_filter(audio: AudioSegment) -> AudioSegment:
+  """簡易ノイズ除去: 低周波ノイズを抑制"""
+  return audio.high_pass_filter(200)
 
 def normalize_volume(audio: AudioSegment, target_db: float = DEFAULT_TARGET_DB) -> AudioSegment:
   """音源の全体音量をtarget_dbに近づける。"""

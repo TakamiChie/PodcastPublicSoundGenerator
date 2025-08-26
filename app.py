@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for, send_file,
 from mutagen.easyid3 import EasyID3
 from mutagen import File as MutagenFile
 from pydub import AudioSegment
-from work import set_bgm, normalize_volume, DEFAULT_TARGET_DB, reduce_noise
+from work import set_bgm, normalize_volume, DEFAULT_TARGET_DB, reduce_noise, highpass_filter
 
 
 app = Flask(__name__)
@@ -164,8 +164,13 @@ def mix():
 
   file.stream.seek(0)
   podcast = AudioSegment.from_file(file)
-  if noise_reduction and noise_reduction == "1stOne":
-    podcast = reduce_noise(podcast)
+  match noise_reduction:
+    case "1stOne":
+      podcast = reduce_noise(podcast)
+    case "highpass":
+      podcast = highpass_filter(podcast)
+    case "none":
+      pass
   podcast = normalize_volume(podcast, target_db)
 
   final_mix = set_bgm(podcast, bgm_name)
