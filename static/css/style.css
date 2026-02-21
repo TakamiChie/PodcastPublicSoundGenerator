@@ -71,6 +71,7 @@ form .form-item {
 .form-item>select,
 .form-item>audio {
   flex: 1;
+  max-width: 450px;
 }
 
 /* ラベルがない要素は位置を合わせる */
