@@ -172,13 +172,13 @@ def mix():
 
   file.stream.seek(0)
   podcast = AudioSegment.from_file(file)
-  match noise_reduction:
-    case "1stOne":
+  if noise_reduction == "1stOne":
       podcast = reduce_noise(podcast)
-    case "highpass":
+  elif noise_reduction == "highpass":
       podcast = highpass_filter(podcast)
-    case "none":
+  elif noise_reduction == "none":
       pass
+
   podcast = normalize_volume(podcast, target_db)
 
   if use_custom_bgm:
