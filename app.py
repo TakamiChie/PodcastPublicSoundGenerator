@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for, send_file,
 from mutagen.easyid3 import EasyID3
 from mutagen import File as MutagenFile
 from pydub import AudioSegment
-from work import set_bgm, normalize_volume, DEFAULT_TARGET_DB, reduce_noise, highpass_filter
+from work import set_bgm, normalize_volume, DEFAULT_TARGET_DB, reduce_noise, highpass_filter, HAS_NOISE_REDUCE
 
 
 app = Flask(__name__)
@@ -118,7 +118,12 @@ def get_cover_templates():
 @app.route('/')
 def index():
   options = get_bgm_options()
-  return render_template('index.html', options=options, target_db=DEFAULT_TARGET_DB)
+  return render_template(
+    'index.html',
+    options=options,
+    target_db=DEFAULT_TARGET_DB,
+    has_noise_reduce=HAS_NOISE_REDUCE
+  )
 
 
 @app.route('/cover_templates')

@@ -1,13 +1,21 @@
 import os
-import numpy as np
-import noisereduce as nr
 from pydub import AudioSegment
+
+try:
+  import numpy as np
+  import noisereduce as nr
+  HAS_NOISE_REDUCE = True
+except ImportError:
+  HAS_NOISE_REDUCE = False
+  print("Warning: numpy or noisereduce not found. Noise reduction feature ('1stOne') is disabled.")
 
 DEFAULT_TARGET_DB = 80.0
 
 
 def reduce_noise(audio: AudioSegment, sample_duration_ms: int = 1000) -> AudioSegment:
   """最初のsample_duration_msミリ秒をノイズとして抽出し、全体から除去する。"""
+  if not HAS_NOISE_REDUCE:
+    return audio
   if len(audio) <= sample_duration_ms:
     return audio
   noise_sample = audio[:sample_duration_ms]
