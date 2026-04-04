@@ -7,7 +7,6 @@ try:
   HAS_NOISE_REDUCE = True
 except ImportError:
   HAS_NOISE_REDUCE = False
-  print("Warning: numpy or noisereduce not found. Noise reduction feature ('1stOne') is disabled.")
 
 DEFAULT_TARGET_DB = 80.0
 
