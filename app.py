@@ -136,6 +136,7 @@ def bgm(filename):
 @app.route('/mix', methods=['POST'])
 def mix():
   file = request.files.get('audio')
+  custom_bgm_file = request.files.get('custom_bgm')
   last_modified = request.form.get('last_modified')
   bgm_name = request.form.get('bgm')
   title = request.form.get('title') or ''
@@ -148,11 +149,13 @@ def mix():
     target_db = float(target_str)
   except ValueError:
     target_db = DEFAULT_TARGET_DB
-  if not file or not bgm_name:
+  use_custom_bgm = bool(custom_bgm_file and custom_bgm_file.filename)
+
+  if not file or (not bgm_name and not use_custom_bgm):
     return redirect(url_for('index'))
 
   release_date = extract_release_date(file, last_modified, release_date)
-  album = get_album_name(bgm_name)
+  album = '' if use_custom_bgm else get_album_name(bgm_name)
 
   # 入力音声のID3タグを取得
   try:
@@ -173,7 +176,12 @@ def mix():
       pass
   podcast = normalize_volume(podcast, target_db)
 
-  final_mix = set_bgm(podcast, bgm_name)
+  if use_custom_bgm:
+    custom_bgm_file.stream.seek(0)
+    custom_bgm = AudioSegment.from_file(custom_bgm_file)
+    final_mix = set_bgm(podcast, custom_bgm)
+  else:
+    final_mix = set_bgm(podcast, bgm_name)
 
   uuid_val = update_uuid(file, last_modified)
   output_name = f"{uuid_val}.mp3"

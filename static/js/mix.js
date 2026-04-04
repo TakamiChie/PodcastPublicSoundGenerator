@@ -2,6 +2,7 @@
   // ミックス処理を自動化
   const form = document.querySelector('form');
   const audioInput = document.getElementById('audio');
+  const customBgmInput = document.getElementById('customBgm');
   const mixedAudio = document.getElementById('mixedAudio');
   const mixedDownload = document.getElementById('mixedDownload');
   const mixProgress = document.getElementById('mixProgress');
@@ -73,6 +74,7 @@
   // #audio に設定されたファイル名からBGMを自動選択
   function autoSelectBgm() {
     if (!audioInput.files.length) return;
+    if (customBgmInput.files.length) return;
     const name = audioInput.files[0].name;
     if (selectBgmByName(name)) return;
     const m = name.match(/^(\d{4}-\d{2}-\d{2})/);
@@ -133,4 +135,3 @@
     mix();
   });
 })();
-
