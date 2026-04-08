@@ -63,16 +63,44 @@
   dateInput.addEventListener('change', updateCover);
 
   // PNG形式でダウンロード（3000px×3000px）
-  coverDownload.addEventListener('click', e => {
+  coverDownload.addEventListener('click', async e => {
     e.preventDefault();
-    const body = coverFrame.contentDocument.body;
-    const scale = 3000 / body.clientWidth;
-    html2canvas(body, { scale }).then(canvas => {
-      const a = document.createElement('a');
-      a.href = canvas.toDataURL('image/png');
-      a.download = coverDownload.dataset.filename || 'cover.png';
-      a.click();
-    });
+    const node = coverFrame.contentDocument.documentElement;
+    const rect = node.getBoundingClientRect();
+    const clone = node.cloneNode(true);
+    const links = clone.querySelectorAll('link[rel="stylesheet"]');
+    for (const link of links) {
+      const css = await fetch(link.href).then(r => r.text());
+      const style = document.createElement('style');
+      style.textContent = css;
+      link.replaceWith(style);
+    }
+    const serialized = new XMLSerializer().serializeToString(clone);
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${rect.width}" height="${rect.height}"><foreignObject width="100%" height="100%">${serialized}</foreignObject></svg>`;
+    const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 3000;
+      canvas.height = 3000;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(async blob => {
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        } catch (err) {
+          console.error('クリップボードへのコピーに失敗しました', err);
+        }
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = coverDownload.dataset.filename || 'cover.png';
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }, 'image/png');
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
   });
 
   document.addEventListener('DOMContentLoaded', loadTemplates);
