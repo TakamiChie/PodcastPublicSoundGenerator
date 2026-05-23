@@ -99,7 +99,29 @@
 
   // 音量を正規化 (簡易)
   function normalizeVolume(buffer, targetDb) {
-    // dBFS計算は難しいので、簡易的にスキップ
+    // targetDbを0.0〜1.0の振幅比率として解釈します (例: 80.0 -> 0.8)
+    const targetAmplitude = targetDb / 100;
+    let maxVal = 0;
+
+    // 1. 全チャンネルをスキャンして最大振幅（ピーク）を見つける
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+      const data = buffer.getChannelData(c);
+      for (let i = 0; i < data.length; i++) {
+        const v = Math.abs(data[i]);
+        if (v > maxVal) maxVal = v;
+      }
+    }
+
+    // 2. ピーク値に基づいて全サンプルのゲインを調整する
+    if (maxVal > 0) {
+      const ratio = targetAmplitude / maxVal;
+      for (let c = 0; c < buffer.numberOfChannels; c++) {
+        const data = buffer.getChannelData(c);
+        for (let i = 0; i < data.length; i++) {
+          data[i] *= ratio;
+        }
+      }
+    }
     return buffer;
   }
 
