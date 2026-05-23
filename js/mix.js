@@ -126,9 +126,43 @@
   }
 
   // ハイパスフィルタ (簡易)
-  function applyHighpass(buffer) {
-    // Web Audio APIでフィルタ適用
-    return buffer;
+  async function applyHighpass(buffer) {
+    // 100Hz以下の低域（環境ノイズなど）をカットします
+    return await Tone.Offline(() => {
+      const player = new Tone.Player(buffer);
+      const filter = new Tone.Filter(100, "highpass").toDestination();
+      player.connect(filter);
+      player.start(0);
+    }, buffer.duration, buffer.numberOfChannels, buffer.sampleRate);
+  }
+
+  // ノイズゲート (最初の一秒をリファレンスにし、かつカットする)
+  async function applyNoiseGateFromFirstSecond(buffer) {
+    const sampleRate = buffer.sampleRate;
+    const trimTime = 1; // 1秒分をノイズ解析＆削除対象とする
+    const firstSecondFrames = Math.min(sampleRate * trimTime, buffer.length);
+    let maxNoisePeak = 0;
+
+    // 1. 最初の一秒をスキャンして最大振幅を計測
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+      const data = buffer.getChannelData(c);
+      for (let i = 0; i < firstSecondFrames; i++) {
+        const v = Math.abs(data[i]);
+        if (v > maxNoisePeak) maxNoisePeak = v;
+      }
+    }
+    // 2. 閾値を決定 (振幅をデシベルに変換)
+    const thresholdDb = maxNoisePeak > 0 ? 20 * Math.log10(maxNoisePeak) : -100;
+
+    // 3. ゲートを適用しつつ、最初の一秒を除去してレンダリング
+    const newDuration = Math.max(0, buffer.duration - trimTime);
+    return await Tone.Offline(() => {
+      const player = new Tone.Player(buffer);
+      const gate = new Tone.Gate(thresholdDb, 0.1).toDestination();
+      player.connect(gate);
+      // offsetにtrimTime(1s)を指定して再生開始
+      player.start(0, trimTime);
+    }, newDuration, buffer.numberOfChannels, buffer.sampleRate);
   }
 
   // BGMをセット
@@ -185,7 +219,9 @@
       const noiseReduction = document.getElementById('noise_reduction').value;
       let processedBuffer = audioBuffer;
       if (noiseReduction === 'highpass') {
-        processedBuffer = applyHighpass(processedBuffer);
+        processedBuffer = await applyHighpass(processedBuffer);
+      } else if (noiseReduction === '1stOne') {
+        processedBuffer = await applyNoiseGateFromFirstSecond(processedBuffer);
       }
 
       // 正規化
