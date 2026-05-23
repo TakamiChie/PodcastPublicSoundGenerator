@@ -84,15 +84,10 @@
   }
 
   // 音声ファイルをロード
-  function loadAudio(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        Tone.context.decodeAudioData(reader.result, resolve, reject);
-      };
-      reader.onerror = reject;
-      reader.readAsArrayBuffer(file);
-    });
+  async function loadAudio(file) {
+    // FileReaderの代わりにfile.arrayBuffer()を使用
+    const arrayBuffer = await file.arrayBuffer();
+    return await Tone.context.decodeAudioData(arrayBuffer);
   }
 
   // URLから音声ファイルをロード
@@ -126,12 +121,11 @@
     const numLoops = Math.ceil(totalDuration / bgmDuration);
     // 簡易的にTone.Offlineでミックス
     const buffer = await Tone.Offline(async () => {
-      const bgmPlayer = new Tone.Player(bgmBuffer).toDestination();
+      const bgmPlayer = new Tone.Player(bgmBuffer);
       const podcastPlayer = new Tone.Player(podcastBuffer).toDestination();
       // BGM duck
       const gainNode = new Tone.Gain().toDestination();
       bgmPlayer.connect(gainNode);
-      podcastPlayer.connect(Tone.Destination);
       bgmPlayer.loop = true;
       bgmPlayer.start(0);
       podcastPlayer.start(introDuration);
@@ -222,10 +216,16 @@
     view.setUint32(40, length * numChannels * 2, true);
 
     // Data
+    // パフォーマンス向上のため、チャンネルデータをループの外で取得
+    const channels = [];
+    for (let channel = 0; channel < numChannels; channel++) {
+      channels.push(buffer.getChannelData(channel));
+    }
+
     let offset = 44;
     for (let i = 0; i < length; i++) {
       for (let channel = 0; channel < numChannels; channel++) {
-        const sample = Math.max(-1, Math.min(1, buffer.getChannelData(channel)[i]));
+        const sample = Math.max(-1, Math.min(1, channels[channel][i]));
         view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
         offset += 2;
       }
