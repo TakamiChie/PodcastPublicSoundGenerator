@@ -64,13 +64,34 @@ async function loadFiles() {
   // BGMセレクトボックスを更新
   const bgmSelect = document.getElementById('bgm');
   bgmSelect.innerHTML = '';
+
+  const bgmGroups = {};
   bgmFiles.forEach(file => {
     if (file.endsWith('.mp3') || file.endsWith('.wav')) {
-      const option = document.createElement('option');
-      option.value = bgmBaseUrl + file;
-      option.textContent = file;
-      bgmSelect.appendChild(option);
+      const parts = file.split('/');
+      const groupName = parts.length > 1 ? parts.slice(0, -1).join('/') : 'ルート';
+      const fileName = parts[parts.length - 1];
+      if (!bgmGroups[groupName]) bgmGroups[groupName] = [];
+      bgmGroups[groupName].push({ fullPath: file, fileName });
     }
+  });
+
+  Object.keys(bgmGroups).sort((a, b) => {
+    if (a === 'ルート') return -1;
+    if (b === 'ルート') return 1;
+    return a.localeCompare(b);
+  }).forEach(groupName => {
+    const optgroup = document.createElement('optgroup');
+    optgroup.label = groupName;
+    bgmGroups[groupName].forEach(item => {
+      const option = document.createElement('option');
+      option.value = bgmBaseUrl + item.fullPath;
+      option.textContent = item.fileName;
+      // mix.jsの自動選択機能で使用するベースネームをセット
+      option.dataset.basename = item.fileName.replace(/\.[^/.]+$/, '');
+      optgroup.appendChild(option);
+    });
+    bgmSelect.appendChild(optgroup);
   });
 
   // テンプレートセレクトボックスを更新
