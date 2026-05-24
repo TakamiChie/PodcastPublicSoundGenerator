@@ -7,8 +7,9 @@ async function loadFiles() {
   let templateBaseUrl = '';
 
   if (isLocal) {
-    bgmBaseUrl = 'bgm/';
-    templateBaseUrl = 'static/templates/';
+    // jsmediatagsがパスを正しく認識できるよう、相対パスではなく絶対URLを生成する
+    bgmBaseUrl = new URL('bgm/', window.location.href).href;
+    templateBaseUrl = new URL('static/templates/', window.location.href).href;
     // ローカルではfiles.jsonを読み込む（fileget.pyで生成）
     try {
       const response = await fetch('files.json');
@@ -66,15 +67,45 @@ async function loadFiles() {
   bgmSelect.innerHTML = '';
 
   const bgmGroups = {};
+  const metadataPromises = [];
+
   bgmFiles.forEach(file => {
     if (file.endsWith('.mp3') || file.endsWith('.wav')) {
       const parts = file.split('/');
       const groupName = parts.length > 1 ? parts.slice(0, -1).join('/') : 'ルート';
       const fileName = parts[parts.length - 1];
       if (!bgmGroups[groupName]) bgmGroups[groupName] = [];
-      bgmGroups[groupName].push({ fullPath: file, fileName });
+
+      const item = { fullPath: file, fileName, displayName: fileName };
+      bgmGroups[groupName].push(item);
+
+      // MP3の場合はID3タグのタイトル取得を試みる (jsmediatagsライブラリが必要)
+      if (file.endsWith('.mp3') && typeof jsmediatags !== 'undefined') {
+        metadataPromises.push(new Promise(resolve => {
+          try {
+            jsmediatags.read(bgmBaseUrl + file, {
+              onSuccess: (tag) => {
+                if (tag.tags && tag.tags.title) {
+                  item.displayName = `${tag.tags.title}(${fileName})`;
+                }
+                resolve();
+              },
+              onError: () => resolve() // 読み込みエラー時はファイル名のまま続行
+            });
+          } catch (e) {
+            // ライブラリのReader初期化失敗などの例外をキャッチ
+            console.error('jsmediatags read error:', e, bgmBaseUrl + file);
+            resolve();
+          }
+        }));
+      }
     }
   });
+
+  // 全てのメタデータ取得完了を待機
+  if (metadataPromises.length > 0) {
+    await Promise.all(metadataPromises);
+  }
 
   Object.keys(bgmGroups).sort((a, b) => {
     if (a === 'ルート') return -1;
@@ -86,7 +117,7 @@ async function loadFiles() {
     bgmGroups[groupName].forEach(item => {
       const option = document.createElement('option');
       option.value = bgmBaseUrl + item.fullPath;
-      option.textContent = item.fileName;
+      option.textContent = item.displayName;
       // mix.jsの自動選択機能で使用するベースネームをセット
       option.dataset.basename = item.fileName.replace(/\.[^/.]+$/, '');
       optgroup.appendChild(option);
