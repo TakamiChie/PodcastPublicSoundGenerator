@@ -31,13 +31,14 @@
     const select = document.getElementById('bgm');
     let fallback = null;
     for (const opt of select.options) {
-      const fname = opt.value;
-      const m = fname.match(/bgm_(\d{2})(\d{2})?/);
+      const bn = opt.dataset.basename || '';
+      const m = bn.match(/bgm_(\d{2})(\d{2})?/);
       if (!m) continue;
       if (m[1] !== dayNo) continue;
       if (m[2]) {
         if (m[2] === weekNo) {
           select.value = opt.value;
+          select.dispatchEvent(new Event('change'));
           return true;
         }
       } else {
@@ -46,6 +47,7 @@
     }
     if (fallback) {
       select.value = fallback.value;
+      select.dispatchEvent(new Event('change'));
       return true;
     }
     return false;
@@ -66,6 +68,7 @@
     }
     if (bestOpt) {
       select.value = bestOpt.value;
+      select.dispatchEvent(new Event('change'));
       return true;
     }
     return false;
@@ -77,7 +80,7 @@
     if (customBgmInput.files.length) return;
     const name = audioInput.files[0].name;
     if (selectBgmByName(name)) return;
-    const m = name.match(/^(\d{4}-\d{2}-\d{2})/);
+    const m = name.match(/(\d{4}-\d{2}-\d{2})/);
     if (!m) return;
     const date = new Date(m[1]);
     selectBgmByDate(date);
