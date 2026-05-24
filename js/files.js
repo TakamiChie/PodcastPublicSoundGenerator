@@ -7,7 +7,7 @@ async function loadFiles() {
   let templateBaseUrl = '';
 
   if (isLocal) {
-    bgmBaseUrl = 'static/bgm/';
+    bgmBaseUrl = 'bgm/';
     templateBaseUrl = 'static/templates/';
     // ローカルではfiles.jsonを読み込む（fileget.pyで生成）
     try {
@@ -21,11 +21,11 @@ async function loadFiles() {
   } else {
     // GitHub PagesではGitHub APIを使用
     const repo = 'TakamiChie/PodcastPublicSoundGenerator';
-    bgmBaseUrl = `https://raw.githubusercontent.com/${repo}/master/static/bgm/`;
+    bgmBaseUrl = `https://raw.githubusercontent.com/${repo}/master/bgm/`;
     templateBaseUrl = `https://raw.githubusercontent.com/${repo}/master/static/templates/`;
     try {
       const [bgmRes, templateRes] = await Promise.all([
-        fetch(`https://api.github.com/repos/${repo}/contents/static/bgm`),
+        fetch(`https://api.github.com/repos/${repo}/contents/bgm`),
         fetch(`https://api.github.com/repos/${repo}/contents/static/templates/`)
       ]);
       const bgmData = await bgmRes.json();
