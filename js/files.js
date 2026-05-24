@@ -23,14 +23,38 @@ async function loadFiles() {
     const repo = 'TakamiChie/PodcastPublicSoundGenerator';
     bgmBaseUrl = `https://raw.githubusercontent.com/${repo}/master/bgm/`;
     templateBaseUrl = `https://raw.githubusercontent.com/${repo}/master/static/templates/`;
+
+    // サブディレクトリを再帰的に検索する関数
+    async function getFilesRecursively(path, extension) {
+      const files = [];
+      try {
+        const response = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`);
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          for (const item of data) {
+            if (item.type === 'file' && item.name.endsWith(extension)) {
+              files.push(item.path.replace(path + '/', ''));
+            } else if (item.type === 'dir') {
+              // サブディレクトリを再帰的に検索
+              const subFiles = await getFilesRecursively(item.path, extension);
+              files.push(...subFiles);
+            }
+          }
+        }
+      } catch (e) {
+        console.error(`GitHub API エラー (${path}):`, e);
+      }
+      return files;
+    }
+
     try {
       const [bgmRes, templateRes] = await Promise.all([
-        fetch(`https://api.github.com/repos/${repo}/contents/bgm`),
+        getFilesRecursively('bgm', '.mp3'),
         fetch(`https://api.github.com/repos/${repo}/contents/static/templates/`)
       ]);
-      const bgmData = await bgmRes.json();
+      bgmFiles = bgmRes;
       const templateData = await templateRes.json();
-      bgmFiles = bgmData.filter(item => item.type === 'file').map(item => item.name);
       templateFiles = templateData.filter(item => item.type === 'file').map(item => item.name);
     } catch (e) {
       console.error('GitHub APIエラー:', e);
