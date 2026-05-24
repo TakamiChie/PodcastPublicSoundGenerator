@@ -1,5 +1,8 @@
 // ファイル取得
 async function loadFiles() {
+  const audioInput = document.getElementById('audio');
+  if (audioInput) audioInput.disabled = true;
+
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
   let bgmFiles = [];
   let templateFiles = [];
@@ -140,6 +143,8 @@ async function loadFiles() {
   // グローバル変数に設定
   window.bgmBaseUrl = bgmBaseUrl;
   window.templateBaseUrl = templateBaseUrl;
+
+  if (audioInput) audioInput.disabled = false;
 }
 
 loadFiles();
