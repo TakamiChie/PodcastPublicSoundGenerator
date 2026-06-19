@@ -1,6 +1,33 @@
+// オーディオIDキャッシュ（ファイルキー => ユニークID）
+window._audioIdCache = window._audioIdCache || {};
+
+/**
+ * ファイルオブジェクトに対応するユニークIDを生成・返却する。
+ * 同じファイル（名前・サイズ・最終更新日時が一致）は常に同じIDを返す。
+ * @param {File} file
+ * @returns {string}
+ */
+function getOrCreateAudioId(file) {
+  const key = `${file.name}|${file.size}|${file.lastModified}`;
+  if (!window._audioIdCache[key]) {
+    // ランダムなユニークIDを生成（crypto.randomUUID が使えない場合は手動生成）
+    const id = typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+          const r = Math.random() * 16 | 0;
+          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+    window._audioIdCache[key] = id;
+  }
+  return window._audioIdCache[key];
+}
+
 document.getElementById('audio').addEventListener('change', function (event) {
   const file = event.target.files[0];
   if (!file) return;
+
+  // ポッドキャスト音声を読み込んだ瞬間にユニークIDを生成（同一ファイルは同一ID）
+  window.currentAudioId = getOrCreateAudioId(file);
 
   // ファイル名から日付 (yyyy-mm-dd) を抽出して反映
   const dateMatch = file.name.match(/(\d{4}-\d{2}-\d{2})/);

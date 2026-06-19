@@ -40,7 +40,8 @@
         }
         coverFrame.srcdoc = modifiedHtml;
         // download filename
-        coverDownload.dataset.filename = `cover_${Date.now()}.png`;
+        const uid = window.currentAudioId || Date.now();
+        coverDownload.dataset.filename = `cover_${uid}.png`;
       });
   }
 

@@ -161,64 +161,20 @@
       // BGMミックス
       const mixedBuffer = await setBgm(processedBuffer, bgmBuffer);
 
-      // Blob作成
-      const wavBlob = audioBufferToWav(mixedBuffer);
-      const url = URL.createObjectURL(wavBlob);
+      // MP3エンコード & ID3タグ書き込み
+      const mp3ArrayBuffer = Mp3Helper.audioBufferToMp3(mixedBuffer);
+      const mp3Blob = await Mp3Helper.writeId3Tags(mp3ArrayBuffer);
+      const url = URL.createObjectURL(mp3Blob);
+      const uid = window.currentAudioId || Date.now();
       mixedAudio.src = url;
       mixedDownload.href = url;
-      mixedDownload.download = 'mixed.wav';
+      mixedDownload.download = `mixed_${uid}.mp3`;
 
       mixProgress.style.display = 'none';
     } catch (e) {
       console.error(e);
       mixProgress.style.display = 'none';
     }
-  }
-
-  // AudioBuffer to WAV Blob
-  function audioBufferToWav(buffer) {
-    const length = buffer.length;
-    const numChannels = buffer.numberOfChannels;
-    const sampleRate = buffer.sampleRate;
-    const arrayBuffer = new ArrayBuffer(44 + length * numChannels * 2);
-    const view = new DataView(arrayBuffer);
-
-    // WAV header
-    const writeString = (offset, string) => {
-      for (let i = 0; i < string.length; i++) {
-        view.setUint8(offset + i, string.charCodeAt(i));
-      }
-    };
-    writeString(0, 'RIFF');
-    view.setUint32(4, 36 + length * numChannels * 2, true);
-    writeString(8, 'WAVE');
-    writeString(12, 'fmt ');
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, numChannels, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * numChannels * 2, true);
-    view.setUint16(32, numChannels * 2, true);
-    view.setUint16(34, 16, true);
-    writeString(36, 'data');
-    view.setUint32(40, length * numChannels * 2, true);
-
-    // Data
-    // パフォーマンス向上のため、チャンネルデータをループの外で取得
-    const channels = [];
-    for (let channel = 0; channel < numChannels; channel++) {
-      channels.push(buffer.getChannelData(channel));
-    }
-
-    let offset = 44;
-    for (let i = 0; i < length; i++) {
-      for (let channel = 0; channel < numChannels; channel++) {
-        const sample = Math.max(-1, Math.min(1, channels[channel][i]));
-        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
-        offset += 2;
-      }
-    }
-    return new Blob([arrayBuffer], { type: 'audio/wav' });
   }
 
   form.addEventListener('submit', (e) => {
