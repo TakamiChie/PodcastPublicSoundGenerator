@@ -44,6 +44,7 @@
         coverDownload.dataset.filename = `cover_${uid}.png`;
       });
   }
+  window.updateCover = updateCover; // グローバルに公開
 
   // 新しいファイルが選択されたらメタ情報をリセット
   audioInput.addEventListener('change', () => {

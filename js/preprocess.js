@@ -14,9 +14,9 @@ function getOrCreateAudioId(file) {
     const id = typeof crypto !== 'undefined' && crypto.randomUUID
       ? crypto.randomUUID()
       : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-          const r = Math.random() * 16 | 0;
-          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-        });
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+      });
     window._audioIdCache[key] = id;
   }
   return window._audioIdCache[key];
@@ -67,6 +67,7 @@ document.getElementById('audio').addEventListener('change', function (event) {
           el.value = tags.artist;
           el.dispatchEvent(new Event('change'));
         }
+        window.updateCover(); // カバーアートも更新
       },
       onError: function (error) {
         console.error('ID3タグの読み取りに失敗しました:', error.type, error.info);

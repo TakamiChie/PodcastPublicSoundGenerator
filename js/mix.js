@@ -182,4 +182,11 @@
     mix();
   });
 
+  // オーディオが設定（選択）されたら自動でミックスを開始する
+  audioInput.addEventListener('change', () => {
+    if (audioInput.files && audioInput.files.length) {
+      mix();
+    }
+  });
+
 })();
