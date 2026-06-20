@@ -8,10 +8,14 @@
   const mixProgress = document.getElementById('mixProgress');
   const mixedRate = document.getElementById('mixedRate');
 
-  // 再生速度変更
-  mixedRate.addEventListener('change', () => {
+  function applyMixedPlaybackRate() {
     mixedAudio.playbackRate = parseFloat(mixedRate.value);
-  });
+  }
+
+  // 再生速度変更
+  mixedRate.addEventListener('change', applyMixedPlaybackRate);
+  mixedAudio.addEventListener('loadedmetadata', applyMixedPlaybackRate);
+  applyMixedPlaybackRate();
 
   // 音声ファイルをロード
   async function loadAudio(file) {
@@ -167,6 +171,7 @@
       const url = URL.createObjectURL(mp3Blob);
       const uid = window.currentAudioId || Date.now();
       mixedAudio.src = url;
+      applyMixedPlaybackRate();
       mixedDownload.href = url;
       mixedDownload.download = `mixed_${uid}.mp3`;
 

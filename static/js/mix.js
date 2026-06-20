@@ -8,10 +8,14 @@
   const mixProgress = document.getElementById('mixProgress');
   const mixedRate = document.getElementById('mixedRate');
 
-  // 再生速度変更
-  mixedRate.addEventListener('change', () => {
+  function applyMixedPlaybackRate() {
     mixedAudio.playbackRate = parseFloat(mixedRate.value);
-  });
+  }
+
+  // 再生速度変更
+  mixedRate.addEventListener('change', applyMixedPlaybackRate);
+  mixedAudio.addEventListener('loadedmetadata', applyMixedPlaybackRate);
+  applyMixedPlaybackRate();
 
   // 日付から曜日番号を取得(Mon=01, Sun=07)
   function getIsoDay(date) {
@@ -183,6 +187,7 @@
       const wavBlob = audioBufferToWav(mixedBuffer);
       const url = URL.createObjectURL(wavBlob);
       mixedAudio.src = url;
+      applyMixedPlaybackRate();
       mixedDownload.href = url;
       mixedDownload.download = 'mixed.wav';
 
@@ -240,40 +245,4 @@
 
   audioInput.addEventListener('change', autoSelectBgm);
 })();
-method: 'POST',
-  body: fd,
-    signal: controller.signal
-      });
-const blob = await res.blob();
-const url = URL.createObjectURL(blob);
-mixedAudio.src = url;
-mixedAudio.playbackRate = parseFloat(mixedRate.value);
-mixedDownload.href = url;
-const disp = res.headers.get('Content-Disposition');
-if (disp) {
-  // ヘッダからファイル名を取得（引用符があってもなくても対応）
-  const m = disp.match(/filename\\*?=(?:UTF-8''|\"?)([^\";]+)/);
-  if (m) {
-    mixedDownload.download = m[1];
-  }
-}
-    } catch (e) {
-  if (e.name !== 'AbortError') {
-    console.error(e);
-  }
-} finally {
-  mixProgress.style.display = 'none';
-  controller = null;
-}
-  }
 
-form.addEventListener('submit', e => {
-  e.preventDefault();
-  mix();
-});
-
-audioInput.addEventListener('change', () => {
-  autoSelectBgm();
-  mix();
-});
-}) ();
