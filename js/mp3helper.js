@@ -1,67 +1,69 @@
 window.Mp3Helper = {
-  /**
-   * AudioBufferをlamejsを使ってMP3のArrayBufferに変換する
-   * @param {AudioBuffer} audioBuffer 
-   * @param {number} kbps 
-   * @returns {ArrayBuffer}
-   */
-  audioBufferToMp3(audioBuffer, kbps = 192) {
-    const channels = Math.min(2, audioBuffer.numberOfChannels); // 最大2チャンネル（ステレオ）
-    const sampleRate = audioBuffer.sampleRate;
-    const mp3Encoder = new lamejs.Mp3Encoder(channels, sampleRate, kbps);
-    const mp3Data = [];
+  runWorker(operation, audioBuffer, options = {}) {
+    const { signal, ...workerOptions } = options;
 
-    const left = audioBuffer.getChannelData(0);
-    const right = channels > 1 ? audioBuffer.getChannelData(1) : null;
+    return new Promise((resolve, reject) => {
+      if (signal?.aborted) {
+        reject(new DOMException('音声処理が中断されました', 'AbortError'));
+        return;
+      }
 
-    const sampleBlockSize = 1152; // LAMEの標準的なブロックサイズ
+      const worker = new Worker('js/audio-processing-worker.js');
+      const channelBuffers = [];
+      for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
+        channelBuffers.push(audioBuffer.getChannelData(channel).slice().buffer);
+      }
 
-    for (let i = 0; i < left.length; i += sampleBlockSize) {
-      const leftChunk = left.subarray(i, i + sampleBlockSize);
-      const rightChunk = right ? right.subarray(i, i + sampleBlockSize) : null;
+      const cleanup = () => {
+        worker.terminate();
+        signal?.removeEventListener('abort', handleAbort);
+      };
+      const handleAbort = () => {
+        cleanup();
+        reject(new DOMException('音声処理が中断されました', 'AbortError'));
+      };
 
-      const left16 = new Int16Array(leftChunk.length);
-      const right16 = right ? new Int16Array(rightChunk.length) : null;
-
-      for (let j = 0; j < leftChunk.length; j++) {
-        // -1.0〜1.0 の Float を 16-bit 整数値 (-32768〜32767) に変換してクランプする
-        left16[j] = Math.max(-32768, Math.min(32767, leftChunk[j] * 32768));
-        if (right16) {
-          right16[j] = Math.max(-32768, Math.min(32767, rightChunk[j] * 32768));
+      signal?.addEventListener('abort', handleAbort, { once: true });
+      worker.addEventListener('message', event => {
+        cleanup();
+        if (event.data.error) {
+          reject(new Error(event.data.error));
+        } else {
+          resolve(event.data);
         }
-      }
+      }, { once: true });
+      worker.addEventListener('error', event => {
+        cleanup();
+        reject(new Error(event.message || '音声処理Workerでエラーが発生しました'));
+      }, { once: true });
+      worker.postMessage({
+        operation,
+        channelBuffers,
+        sampleRate: audioBuffer.sampleRate,
+        ...workerOptions
+      }, channelBuffers);
+    });
+  },
 
-      let mp3buf;
-      if (right16) {
-        mp3buf = mp3Encoder.encodeBuffer(left16, right16);
-      } else {
-        mp3buf = mp3Encoder.encodeBuffer(left16);
-      }
+  async normalizeAudioBuffer(audioBuffer, targetAmplitude, signal) {
+    const { buffers } = await this.runWorker('normalize', audioBuffer, {
+      targetAmplitude,
+      signal
+    });
+    const normalized = Tone.context.rawContext.createBuffer(
+      buffers.length,
+      new Float32Array(buffers[0]).length,
+      audioBuffer.sampleRate
+    );
+    buffers.forEach((buffer, channel) => {
+      normalized.copyToChannel(new Float32Array(buffer), channel);
+    });
+    return normalized;
+  },
 
-      if (mp3buf.length > 0) {
-        mp3Data.push(mp3buf);
-      }
-    }
-
-    // エンコーダーのフラッシュ（残存データの書き出し）
-    const flushBuf = mp3Encoder.flush();
-    if (flushBuf.length > 0) {
-      mp3Data.push(flushBuf);
-    }
-
-    // すべてのバッファチャンクを1つのUint8Arrayに結合
-    let totalLength = 0;
-    for (let i = 0; i < mp3Data.length; i++) {
-      totalLength += mp3Data[i].length;
-    }
-    const combinedBuffer = new Uint8Array(totalLength);
-    let offset = 0;
-    for (let i = 0; i < mp3Data.length; i++) {
-      combinedBuffer.set(mp3Data[i], offset);
-      offset += mp3Data[i].length;
-    }
-
-    return combinedBuffer.buffer;
+  async audioBufferToMp3Async(audioBuffer, kbps = 192, signal) {
+    const { buffer } = await this.runWorker('encodeMp3', audioBuffer, { kbps, signal });
+    return buffer;
   },
 
   /**

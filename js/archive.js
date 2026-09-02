@@ -25,7 +25,7 @@
         // MP3以外（WAV等）の場合はデコードしてMP3に変換し、ID3タグを書き込む
         const arrayBuffer = await file.arrayBuffer();
         const audioBuffer = await Tone.context.decodeAudioData(arrayBuffer);
-        const mp3ArrayBuffer = Mp3Helper.audioBufferToMp3(audioBuffer);
+        const mp3ArrayBuffer = await Mp3Helper.audioBufferToMp3Async(audioBuffer);
         mp3Blob = await Mp3Helper.writeId3Tags(mp3ArrayBuffer);
       }
 

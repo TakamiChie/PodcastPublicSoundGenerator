@@ -31,34 +31,6 @@
       .then(arrayBuffer => Tone.context.decodeAudioData(arrayBuffer));
   }
 
-  // 音量を正規化 (簡易)
-  function normalizeVolume(buffer, targetDb) {
-    // targetDbを0.0〜1.0の振幅比率として解釈します (例: 80.0 -> 0.8)
-    const targetAmplitude = targetDb / 100;
-    let maxVal = 0;
-
-    // 1. 全チャンネルをスキャンして最大振幅（ピーク）を見つける
-    for (let c = 0; c < buffer.numberOfChannels; c++) {
-      const data = buffer.getChannelData(c);
-      for (let i = 0; i < data.length; i++) {
-        const v = Math.abs(data[i]);
-        if (v > maxVal) maxVal = v;
-      }
-    }
-
-    // 2. ピーク値に基づいて全サンプルのゲインを調整する
-    if (maxVal > 0) {
-      const ratio = targetAmplitude / maxVal;
-      for (let c = 0; c < buffer.numberOfChannels; c++) {
-        const data = buffer.getChannelData(c);
-        for (let i = 0; i < data.length; i++) {
-          data[i] *= ratio;
-        }
-      }
-    }
-    return buffer;
-  }
-
   // ハイパスフィルタ (簡易)
   async function applyHighpass(buffer) {
     // 100Hz以下の低域（環境ノイズなど）をカットします
@@ -136,6 +108,7 @@
       controller.abort();
     }
     controller = new AbortController();
+    const currentController = controller;
     mixProgress.style.display = 'inline-block';
     try {
       await Tone.start();
@@ -160,14 +133,25 @@
 
       // 正規化
       const targetDb = parseFloat(document.getElementById('target_db').value);
-      processedBuffer = normalizeVolume(processedBuffer, targetDb);
+      processedBuffer = await Mp3Helper.normalizeAudioBuffer(
+        processedBuffer,
+        targetDb / 100,
+        currentController.signal
+      );
 
       // BGMミックス
       const mixedBuffer = await setBgm(processedBuffer, bgmBuffer);
 
       // MP3エンコード & ID3タグ書き込み
-      const mp3ArrayBuffer = Mp3Helper.audioBufferToMp3(mixedBuffer);
+      const mp3ArrayBuffer = await Mp3Helper.audioBufferToMp3Async(
+        mixedBuffer,
+        192,
+        currentController.signal
+      );
       const mp3Blob = await Mp3Helper.writeId3Tags(mp3ArrayBuffer);
+      if (currentController.signal.aborted) {
+        throw new DOMException('音声処理が中断されました', 'AbortError');
+      }
       const url = URL.createObjectURL(mp3Blob);
       const uid = window.currentAudioId || Date.now();
       mixedAudio.src = url;
@@ -175,10 +159,12 @@
       mixedDownload.href = url;
       mixedDownload.download = `mixed_${uid}.mp3`;
 
-      mixProgress.style.display = 'none';
     } catch (e) {
-      console.error(e);
-      mixProgress.style.display = 'none';
+      if (e.name !== 'AbortError') console.error(e);
+    } finally {
+      if (controller === currentController) {
+        mixProgress.style.display = 'none';
+      }
     }
   }
 
